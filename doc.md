@@ -6,7 +6,7 @@
 
 ---
 
-#### 2. De ce RIPv2?
+#### 2. De ce RIPv2??
 RIPv2 este o versiune imbunatatita a protocolului RIP original. Acesta include o serie impresionanta de dezvoltari menite sa abordeze limitarile predecesorului sau, facandu-l mai adaptabil si mai sigur pentru nevoile moderne de retea.
 <div style="text-align: center;">
   <img src="https://media.fs.com/images/community/erp/6k2R5_XCPBJhJjtp4mcF7NSFjR.jpg" width="500" height="200" />
