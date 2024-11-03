@@ -8,12 +8,9 @@
 
 ### 2. De ce RIPv2??
 RIPv2 este o versiune imbunatatita a protocolului RIP original. Acesta include o serie impresionanta de dezvoltari menite sa abordeze limitarile predecesorului sau, facandu-l mai adaptabil si mai sigur pentru nevoile moderne de retea.
-<p align="center">
-  <img src="https://media.fs.com/images/community/erp/6k2R5_XCPBJhJjtp4mcF7NSFjR.jpg" width="500" height="200" />
-</p>
 
 - [ ] **Rutarea fara clase:** 
-- spre deosebire de RIPv1, RIPv2 _VLSM (Variable Length Subnet Mask)_ si _CIDR (Classless Inter-Domain Routing)_, permitand o alocare mai eficienta si mai flexibila a adreselor IP, incluzand informatii despre masca de subretea cu actualizarile sale de rutare<br/></br>
+- spre deosebire de RIPv1, RIPv2 implementeaza _VLSM (Variable Length Subnet Mask)_ si _CIDR (Classless Inter-Domain Routing)_, permitand o alocare mai eficienta si mai flexibila a adreselor IP, incluzand informatii despre masca de subretea cu actualizarile sale de rutare<br/></br>
 
 - [ ] **Actualizari Multicast:**
 - RIPv2 trimite actualizari utilizand adrese multicast (<ins>224.0.0.9</ins>), ceea ce reduce traficul inutil catre dispozitivele care nu utilizeaza router<br/></br>
@@ -42,10 +39,48 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 ---
 
 ### 5. Formatul de mesaje specific RIPv2
-to be added :)
+- **RIP** este un protocol bazat pe <mark>UDP</mark>. Fiecare router care foloseste RIP are un proces de rutare care trimite si primeste datagrame prin portul UDP 520, desemnat pentru RIPv1/RIPv2. Toate comunicarile destinate procesului RIP de pe un alt router sunt directionate catre acest port. Mai mult, toate mesajele de actualizare a rutarii sunt trimise de la portul RIP. Mesajele de actualizare trimise ca raspuns la o cerere sunt directionate inapoi de la portul de la care a venit cererea. Desi anumite interogari specifice pot fi trimise de la alte porturi decat portul RIP, ele trebuie directionate catre portul RIP al dispozitivului tinta.
+<br></br>
+<div align="center">
+       <ins>Formatul RIPv1</ins>
+       <br></br>
+        
+       0                   1                   2                   3
+       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      | address family identifier (2) |      must be zero (2)         |
+      +-------------------------------+-------------------------------+
+      |                        IPv4 address (4)                       |
+      +---------------------------------------------------------------+
+      |                        must be zero (4)                       |
+      +---------------------------------------------------------------+
+      |                        must be zero (4)                       |
+      +---------------------------------------------------------------+
+      |                           metric (4)                          |
+      +---------------------------------------------------------------+
+</div>
+<br/br>
+<div align="center">
+    <ins>Formatul imbunatatit <mark>RIPv2</mark></ins>
+       <br></br>
+  
+      0                   1                   2                   3 
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+     | Address Family Identifier (2) |        Route Tag (2)          |
+     +-------------------------------+-------------------------------+
+     |                         IP Address (4)                        |
+     +---------------------------------------------------------------+
+     |                         Subnet Mask (4)                       |
+     +---------------------------------------------------------------+
+     |                         Next Hop (4)                          |
+     +---------------------------------------------------------------+
+     |                         Metric (4)                            |
+     +---------------------------------------------------------------+
+  <br></br>
+</div>
 
-
-
+---
 #### Bibliografie
 
 - https://ro.wikipedia.org/wiki/RIP
