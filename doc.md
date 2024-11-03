@@ -44,7 +44,8 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 <div align="center">
        <ins>Formatul RIPv1</ins>
        <br></br>
-        
+       <pre>
+         
        0                   1                   2                   3
        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
       +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -58,11 +59,14 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
       +---------------------------------------------------------------+
       |                           metric (4)                          |
       +---------------------------------------------------------------+
+
+</pre>
 </div>
 <br/br>
 <div align="center">
     <ins>Formatul imbunatatit <mark>RIPv2</mark></ins>
        <br></br>
+       <pre>
   
       0                   1                   2                   3 
       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -77,6 +81,8 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
      +---------------------------------------------------------------+
      |                         Metric (4)                            |
      +---------------------------------------------------------------+
+
+  </pre>
   <br></br>
 </div>
 
