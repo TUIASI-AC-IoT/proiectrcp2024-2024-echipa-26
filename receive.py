@@ -7,6 +7,8 @@ def main():
     
     my_ip = '' 
     my_port = 50001
+    my_sock.setsockopt(SOL_SOCKET, SO_BROADCAST,1)
+
     my_sock.bind((my_ip, my_port))
     
     
