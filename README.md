@@ -104,4 +104,4 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 - https://community.fs.com/article/the-difference-between-ripv1-and-ripv2.html
 - https://ipcisco.com/lesson/routing-information-protocol/
 - https://iopscience.iop.org/article/10.1088/1742-6596/1007/1/012009/pdf
-- https://datatracker.ietf.org/doc/html/rfc2453#section-3.6
+- https://datatracker.ietf.org/doc/html/rfc2453
