@@ -96,6 +96,13 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 - Fiecare ruta are 2 timere asociate: un timeout si un garbage-collection timer. Cand timeout-ul expira ruta nu mai este valida dar ramane in tabelul de rutare pentru a informa si vecinii. Cand expira timer-ul garbage-collection, ruta este eliminata. Timeout-ul este setat cand ruta este gasita si/sau atunci cand un mesaj de update este primit legat de ruta. Timeout-ul este de 180s. Garbage-collection este 120s.
 
 
+### Masina virtuala
+- Masina virtuala folosita este TinyCore, o distributie de Linux lightweight ce va tine locul routerului. In virtual box aceasta a fost configurata cu 64MB de RAM si 250MB disk.
+- In functie de numarul routerului din topologie, fiecare masina este conectata la 2-3 retele interne, o interfata fiind rezervata pentru NAT (virtualbox pune la dispozitie 8 interfete, dar doar 4 fiind accesibile prin GUI).
+- Pe fiecare masina a fost instalat git, openssh si Python (3.6.15) prin intermediul package manager-ului care vine preinstalat.
+- Pentru asignarea adreselor IP in mod static am folosit un modul de pe github, creat special pentru TinyCore.
+- Fiecare interfata are un fisier de config pentru a putea reasigna adresele IP.
+
 
 ---
 #### Bibliografie
@@ -105,3 +112,5 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 - https://ipcisco.com/lesson/routing-information-protocol/
 - https://iopscience.iop.org/article/10.1088/1742-6596/1007/1/012009/pdf
 - https://datatracker.ietf.org/doc/html/rfc2453
+- http://tinycorelinux.net/
+- https://github.com/on-prem/tinycore-network
