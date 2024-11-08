@@ -28,6 +28,7 @@ Acest protocol este bazat pe algoritmul **Bellman-Ford** de calcul al rutelor. B
 Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele isi trimit tabelele de rutare vecinilor lor la fiecare **30** de secunde, prin actualizari periodice. Scopul acestui proces este de a actualiza tabelele de rutare si de a gasi drumuri cat mai bune (scurte) pentru a ajunge la destinatie.
 
 ---
+
  ### Split Horizon si Poison Reverse
 - <mark><ins>Split Horizon</ins></mark> functioneaza pe un principiu simplu dar elegant : un router nu va anunta inapoi pe o interfata informatiile de rutare pe care le-a invatat chiar prin acea interfata. Acesta abordare previne situatiile in care routerele s-ar putea insela reciproc cu informatii de rutare invechite sau chiar incorecte, care ar putea duce la formarea de bucle infinite.
 <br></br>
@@ -96,12 +97,24 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 - Fiecare ruta are 2 timere asociate: un timeout si un garbage-collection timer. Cand timeout-ul expira ruta nu mai este valida dar ramane in tabelul de rutare pentru a informa si vecinii. Cand expira timer-ul garbage-collection, ruta este eliminata. Timeout-ul este setat cand ruta este gasita si/sau atunci cand un mesaj de update este primit legat de ruta. Timeout-ul este de 180s. Garbage-collection este 120s.
 
 
-### Topologia pe care am utilizat-o:
+### Topologia folosita:
 <div align="center">
   
-![Topologie](https://github.com/TUIASI-AC-IoT/proiectrcp2024-2024-echipa-26/blob/main/Images/Diagrama-Implementare.png)
+![Topologie](/Images/Diagrama-Implementare.png)
 
 </div>
+
+## Adrese IP folosite:
+- R01: 192.170.1.1, 192.170.2.1
+- R02: 192.170.1.2, 192.170.3.2
+- R03: 192.170.2.3, 192.170.3.3, 192.170.4.3
+- R04: 192.170.4.4, 192.170.5.4, 192.170.7.4
+- R05: 192.170.5.5, 192.170.6.5
+- R06: 192.170.6.6, 192.170.8.6
+- R07: 192.170.8.7, 192.170.7.7, 192.170.9.7
+- R08: 192.170.9.8, 192.170.10.8, 192.170.12.8
+- R09: 192.170.10.9, 192.170.11.10
+- R10: 192.170.11.10, 192.170.12.10
 
 ### Masina virtuala
 - Masina virtuala folosita este TinyCore, o distributie de Linux lightweight ce va tine locul routerului. In virtual box aceasta a fost configurata cu 64MB de RAM si 250MB disk.
