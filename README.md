@@ -104,7 +104,7 @@ Fiecare ruta are 2 timere asociate: un timeout si un garbage-collection timer. C
 
 
 #### Adrese IP folosite:
-- R01: 192.168.1.1, 192.168.2.0
+- R01: 192.168.1.1, 192.168.2.1
 - R02: 192.168.1.2, 192.168.3.2 
 - R03: 192.168.2.3, 192.168.3.3, 192.168.4.3
 - R04: 192.168.4.4, 192.168.5.4, 192.168.224.4
