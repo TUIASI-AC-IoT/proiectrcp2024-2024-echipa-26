@@ -41,10 +41,8 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 
 ### Formatul de mesaje specific RIPv2
 - **RIP** este un protocol bazat pe <mark>UDP</mark>. Fiecare router care foloseste RIP are un proces de rutare care trimite si primeste datagrame prin portul UDP 520, desemnat pentru RIPv1/RIPv2. Toate comunicarile destinate procesului RIP de pe un alt router sunt directionate catre acest port. Mai mult, toate mesajele de actualizare a rutarii sunt trimise de la portul RIP. Mesajele de actualizare trimise ca raspuns la o cerere sunt directionate inapoi de la portul de la care a venit cererea. Desi anumite interogari specifice pot fi trimise de la alte porturi decat portul RIP, ele trebuie directionate catre portul RIP al dispozitivului tinta.
-<br></br>
-<div align="center">
-    <ins>Formatul RIPv1</ins>
-    <br></br>
+
+<p style="text-align:center">
     
           
      0                   1                   2                   3
@@ -60,10 +58,10 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
     +---------------------------------------------------------------+
     |                           metric (4)                          |
     +---------------------------------------------------------------+
-   
+   </p>
 
-</div>
-<br></br>
+
+
 
 <div align="center">
     <ins>Formatul imbunatatit <mark>RIPv2</mark></ins>
@@ -96,25 +94,33 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 - O data la 30 de secunde, fiecare router trebuie sa-si trimita tabela de rutare catre vecini. Timer-ul nu ar trebui sa fie afectat de cat de incarcat este sistemul. Fiecare timer are un offset de un numar aleator intre 0 si 5 secunde pentru a evita sincronizarea ceasurilor.
 - Fiecare ruta are 2 timere asociate: un timeout si un garbage-collection timer. Cand timeout-ul expira ruta nu mai este valida dar ramane in tabelul de rutare pentru a informa si vecinii. Cand expira timer-ul garbage-collection, ruta este eliminata. Timeout-ul este setat cand ruta este gasita si/sau atunci cand un mesaj de update este primit legat de ruta. Timeout-ul este de 180s. Garbage-collection este 120s.
 
+## Topologia folosita:
+<div align="center">
+  
+![Workflow](/Images/diagrama_cod.jpg)
+
+</div>
 
 ### Topologia folosita:
 <div align="center">
   
-![Topologie](/Images/Diagrama-Implementare.png)
+![Topologie](/Images/Topologie.png)
 
 </div>
 
+#
+
 ## Adrese IP folosite:
-- R01: 192.170.1.1, 192.170.2.1
-- R02: 192.170.1.2, 192.170.3.2
-- R03: 192.170.2.3, 192.170.3.3, 192.170.4.3
-- R04: 192.170.4.4, 192.170.5.4, 192.170.7.4
-- R05: 192.170.5.5, 192.170.6.5
-- R06: 192.170.6.6, 192.170.8.6
-- R07: 192.170.8.7, 192.170.7.7, 192.170.9.7
-- R08: 192.170.9.8, 192.170.10.8, 192.170.12.8
-- R09: 192.170.10.9, 192.170.11.10
-- R10: 192.170.11.10, 192.170.12.10
+- R01: 192.168.1.1, 192.168.2.0
+- R02: 192.168.1.2, 192.168.3.2 
+- R03: 192.168.2.3, 192.168.3.3, 192.168.4.3
+- R04: 192.168.4.4, 192.168.5.4, 192.168.224.4
+- R05: 192.168.5.5, 172.16.48.5
+- R06: 172.16.48.6, 172.16.8.6
+- R07: 192.168.224.7, 172.16.8.7, 192.168.9.7
+- R08: 192.168.9.8, 192.168.64.8, 10.67.192.8
+- R09: 192.168.64.9, 10.3.64.9
+- R10: 10.67.192.10, 10.3.64.10
 
 ### Masina virtuala
 - Masina virtuala folosita este TinyCore, o distributie de Linux lightweight ce va tine locul routerului. In virtual box aceasta a fost configurata cu 64MB de RAM si 250MB disk.
@@ -134,3 +140,5 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 - https://datatracker.ietf.org/doc/html/rfc2453
 - http://tinycorelinux.net/
 - https://github.com/on-prem/tinycore-network
+- https://app.diagrams.net/
+- https://en.wikipedia.org/wiki/Private_network
