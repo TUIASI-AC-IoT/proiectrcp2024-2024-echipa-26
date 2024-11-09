@@ -42,32 +42,32 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 ### Formatul de mesaje specific RIPv2
 - **RIP** este un protocol bazat pe <mark>UDP</mark>. Fiecare router care foloseste RIP are un proces de rutare care trimite si primeste datagrame prin portul UDP 520, desemnat pentru RIPv1/RIPv2. Toate comunicarile destinate procesului RIP de pe un alt router sunt directionate catre acest port. Mai mult, toate mesajele de actualizare a rutarii sunt trimise de la portul RIP. Mesajele de actualizare trimise ca raspuns la o cerere sunt directionate inapoi de la portul de la care a venit cererea. Desi anumite interogari specifice pot fi trimise de la alte porturi decat portul RIP, ele trebuie directionate catre portul RIP al dispozitivului tinta.
 
-<p style="text-align:center">
+<div align="center">
+  <ins>Formatul <mark>RIPv1</mark></ins>
+  
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | address family identifier (2) |      must be zero (2)         |
+    +-------------------------------+-------------------------------+
+    |                        IPv4 address (4)                       |
+    +---------------------------------------------------------------+
+    |                        must be zero (4)                       |
+    +---------------------------------------------------------------+
+    |                        must be zero (4)                       |
+    +---------------------------------------------------------------+
+    |                           metric (4)                          |
+    +---------------------------------------------------------------+
     
-          
-   0                   1                   2                   3
-   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  | address family identifier (2) |      must be zero (2)         |
-  +-------------------------------+-------------------------------+
-  |                        IPv4 address (4)                       |
-  +---------------------------------------------------------------+
-  |                        must be zero (4)                       |
-  +---------------------------------------------------------------+
-  |                        must be zero (4)                       |
-  +---------------------------------------------------------------+
-  |                           metric (4)                          |
-  +---------------------------------------------------------------+
-</p>
+  </div>
+
 
 
 
 
 <div align="center">
     <ins>Formatul imbunatatit <mark>RIPv2</mark></ins>
-    <br></br>
-    
-
+  
      0                   1                   2                   3 
      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -81,10 +81,6 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
     +---------------------------------------------------------------+
     |                         Metric (4)                            |
     +---------------------------------------------------------------+
-    
-    
- 
-  <br></br>
 </div>
 
 
