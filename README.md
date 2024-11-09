@@ -158,3 +158,4 @@ Al doilea proces verifica daca exista mesaje de procesat de la primul proces. Da
 - https://github.com/on-prem/tinycore-network
 - https://app.diagrams.net/
 - https://en.wikipedia.org/wiki/Private_network
+- https://github.com/github/gitignore/blob/main/Python.gitignore
