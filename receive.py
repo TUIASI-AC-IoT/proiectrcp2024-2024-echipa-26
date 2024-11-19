@@ -4,7 +4,7 @@ def main():
     
     sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
     multicast = '224.0.0.9'
-    sock.bind(multicast)
+    sock.bind((multicast, ''))
     mreq = struct.pack("4sl", socket.inet_aton(multicast), socket.INADDR_ANY)
 
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
