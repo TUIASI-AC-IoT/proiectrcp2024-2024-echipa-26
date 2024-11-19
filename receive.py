@@ -1,24 +1,19 @@
 from socket import *
-
+import struct
 def main():
     
-    my_sock = socket(AF_INET, SOCK_DGRAM)
-    
-    
-    my_ip = '' 
-    my_port = 50001
-    my_sock.setsockopt(SOL_SOCKET, SO_BROADCAST,1)
+    sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
+    multicast = '224.0.0.9'
+    sock.bind(multicast)
+    mreq = struct.pack("4sl", socket.inet_aton(multicast), socket.INADDR_ANY)
 
-    my_sock.bind((my_ip, my_port))
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
     
-    
-    send_ip = ''
-    send_port = 50000
-    
-    msg, addr = my_sock.recvfrom(1024, 0)
+    msg, addr = sock.recvfrom(1024, 0)
     print(f"Received: {msg.decode()} from {addr}")
 
-    my_sock.close()
+    sock.close()
 
 if __name__ == "__main__":
     main()
