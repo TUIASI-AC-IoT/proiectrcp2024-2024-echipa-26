@@ -1,4 +1,6 @@
 clasa ruta
 clasa routing table
-multicast send
-multicast listen
+multicast send (partial done)
+multicast listen (partial done)
+
+update masini virtuale=> fetch pull si backup
