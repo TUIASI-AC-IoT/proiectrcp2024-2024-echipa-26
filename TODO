@@ -1,6 +1,11 @@
-clasa ruta
-clasa routing table
+aman2: de gandit un design elegant pentru clasa ruta
+aman2: de gandit un design elegant si eficient pentru clasa routing table
+
+update tabela
 multicast send (partial done)
 multicast listen (partial done)
 
-update masini virtuale=> fetch pull si backup
+asaf: de terminat mesajul
+asaf: de citit despre fiecare camp din msg si ce inseamna efectiv si cum le folosim si cand(request, updates etc)
+alex: update masini virtuale=> fetch pull si backup si id si test tun.sh
+alex: raspuns la un semnal primit cu kill pentru a afisa tabela intr-un mod frumos
