@@ -15,18 +15,12 @@ def main():
         lines = file.readlines()
         ipList.append(lines[2][3:-1])
     
-    print(ipList)
-
-    return
     
-
-
-
     seed(time())
     sleep(randint(1,10))
 
     sender, listener = Pipe(False)
-    listener_process = Process(target =multicast_listener, args=(listener,ipList,))
+    listener_process = Process(target = multicast_listener, args=(listener,ipList,))
     sender_process = Process(target = multicast_sender, args=(sender,ipList,))
 
     listener_process.start()
@@ -35,10 +29,12 @@ def main():
     listener_process.join()
     sender_process.join()
 
-
-    print(f'Listener: {listener_process.pid}')
-    print(f'Sender: {sender_process.pid}')
-    print(f'Run kill -s SIGUSR1 {sender_process.pid} to display the routing table')
+    details = open('home/tc/info', 'w')
+    toWrite = f'Listener: {listener_process.pid}\n' + f'Sender: {sender_process.pid}\n'+f'Run sudo kill -s SIGUSR1 {sender_process.pid} to display the routing table'
+    details.write(toWrite)
+    # print(f'Listener: {listener_process.pid}')
+    # print(f'Sender: {sender_process.pid}')
+    # print(f'Run kill -s SIGUSR1 {sender_process.pid} to display the routing table')
 
 
 if __name__=="__main__":

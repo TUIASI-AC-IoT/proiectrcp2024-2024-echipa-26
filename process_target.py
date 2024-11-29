@@ -51,14 +51,34 @@ def multicast_listener(pipe, ipList):
         if len(ready_to_read)!=0:
             for socket in ready_to_read:
                 #receive data, convert to strings or whatever (not bytes) and send it through the pipe
-                pass
+                data, s = socket.recvfrom(1024)
+                pipe.send((data,s))
+                
 
 
 def multicast_sender(pipe, ipList):
     socketList = getSockets(ipList, True)
+    
+    multicast_port = 520
+    multicast_ip = '224.0.0.9'
+    multicast = (multicast_ip, multicast_port)
+    
     #change data to print
-    data_to_print=0
+    data_to_print=''
     signal.signal(signal.SIGUSR1, partial(sigusr1_handler, data_to_print))
+
+
+    t = time()
+    while True:
+        if pipe.poll(0.1):
+            data = pipe.recv()
+            data_to_print = data_to_print+f'{data[0].decode()} from {data[1]}\n'
+        if time()-t>30:
+            for socket in socketList:
+                socket.sendto("??", multicast)
+            t=time()
+        
+
     while True:
         if pipe.poll(0.05):
             #TODO
