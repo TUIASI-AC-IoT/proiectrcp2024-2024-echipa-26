@@ -7,6 +7,7 @@ from multiprocessing import Process, Pipe
 def main():
 
     print(environ['ID'])
+    sleep(5)
     return
 
 
