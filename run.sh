@@ -7,4 +7,4 @@
 #are rol de debug/faciliteaza munca
 
 
-echo TEST
+python3 main.py
