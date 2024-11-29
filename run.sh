@@ -9,3 +9,4 @@
 
 python3 main.py
 sleep 5
+mv /home/tc/TEST.py /home/tc/test1.py
