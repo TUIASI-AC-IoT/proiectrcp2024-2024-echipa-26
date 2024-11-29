@@ -8,7 +8,7 @@ def main():
 
     ipList = []
     ID = environ['ID']
-    path = f'/home/tc/pr/r{ID}'
+    path = f'/home/tc/pr/cfg/r{ID}'
     for config in listdir(path):
         configPath = path+f'/{config}'
         file = open(configPath)
