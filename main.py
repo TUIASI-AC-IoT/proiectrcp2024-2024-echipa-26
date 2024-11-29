@@ -16,7 +16,7 @@ def main():
         ipList.append(lines[2][3:-1])
     
     print(ipList)
-    sleep(20)
+
     return
     
 
