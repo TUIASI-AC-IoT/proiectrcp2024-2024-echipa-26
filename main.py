@@ -1,10 +1,15 @@
 from time import sleep, time
 from random import seed, randint
-
+from os import environ
 from process_target import *
 
 from multiprocessing import Process, Pipe
 def main():
+
+    print(environ['ID'])
+    return
+
+
     seed(time())
     sleep(randint(1,10))
 
@@ -17,3 +22,6 @@ def main():
 
     listener_process.join()
     sender_process.join()
+
+if __name__=="__main__":
+    main()
