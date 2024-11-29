@@ -16,7 +16,9 @@ def main():
         ipList.append(lines[2][3:-1])
     
     print(ipList)
+    sleep[20]
     return
+    
 
 
 
@@ -24,14 +26,20 @@ def main():
     sleep(randint(1,10))
 
     sender, listener = Pipe(False)
-    listener_process = Process(target =multicast_listener, args=(listener,))
-    sender_process = Process(target = multicast_sender, args=(sender,))
+    listener_process = Process(target =multicast_listener, args=(listener,ipList,))
+    sender_process = Process(target = multicast_sender, args=(sender,ipList,))
 
     listener_process.start()
     sender_process.start()
 
     listener_process.join()
     sender_process.join()
+
+
+    print(f'Listener: {listener_process.pid}')
+    print(f'Sender: {sender_process.pid}')
+    print(f'Send signal <insert signal> to {sender_process.pid} to display the routing table.')
+
 
 if __name__=="__main__":
     main()
