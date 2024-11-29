@@ -29,7 +29,7 @@ def main():
     listener_process.join()
     sender_process.join()
 
-    details = open('home/tc/info', 'w')
+    details = open('home/tc/info', 'w+')
     toWrite = f'Listener: {listener_process.pid}\n' + f'Sender: {sender_process.pid}\n'+f'Run sudo kill -s SIGUSR1 {sender_process.pid} to display the routing table'
     details.write(toWrite)
     # print(f'Listener: {listener_process.pid}')
