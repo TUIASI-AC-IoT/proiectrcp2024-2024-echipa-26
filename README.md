@@ -1,12 +1,12 @@
 # RIPv2 - DOCUMENTATION
 
 
-### Ce este RIP?
+### <ins>Ce este RIP?</ins>
 <mark>RIP (Routing Information Protocol)</mark> este un protocol de rutare fara clase, de tip distanta-vector, ce implica utilizarea ca metrica de rutare a numarului de pasi de rutut - <ins>"hop count"</ins>. Prin aceasta, RIP previne aparitia buclelor de rutare, utilizand o valoare limita maxima, aceasta fiind de regula **15**   (valoarea de 16 reprezinta o distanta de rutare infinita).
 
 ---
 
-### De ce RIPv2?
+### <ins>De ce RIPv2?</ins>
 RIPv2 este o versiune imbunatatita a protocolului RIP original. Acesta include o serie impresionanta de dezvoltari menite sa abordeze limitarile predecesorului sau, facandu-l mai adaptabil si mai sigur pentru nevoile moderne de retea.
 
 **Rutarea fara clase:**
@@ -23,7 +23,7 @@ De asemenea, RIPv2 include suport pentru text simplu si autentificare _MD5 (func
 
 --- 
 
-### Cum functioneaza RIPv2?
+### <ins>Cum functioneaza RIPv2?</ins>
 Acest protocol este bazat pe algoritmul **Bellman-Ford** de calcul al rutelor. Bellman-Ford este practic un algoritm ce rezolva gasirea drumului minim de la un nod sursa la celalte noduri. Acesta numara "hop"-urile, cel mai bun fiind cel mai apropiat de host (numarul maxim = 15). Daca acest numar de "hop"-uri ajunge la 16, inseamna ca acea ruta este inaccesibila, existand o potentiala bucla.
 <p align="center"> 
   <img src="https://ipcisco.com/wp-content/uploads/rip/routing-with-rip.jpg" width="400" height="250" />
@@ -34,7 +34,7 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 
 ---
 
- ### Split Horizon si Poison Reverse
+ ### <ins>Split Horizon si Poison Reverse</ins>
 <mark><ins>Split Horizon</ins></mark> functioneaza pe un principiu simplu dar elegant : un router nu va anunta inapoi pe o interfata informatiile de rutare pe care le-a invatat chiar prin acea interfata. Acesta abordare previne situatiile in care routerele s-ar putea insela reciproc cu informatii de rutare invechite sau chiar incorecte, care ar putea duce la formarea de bucle infinite.
 <br></br>
 <mark><ins>Poison Reverse</ins></mark> adopta o abordare mai directa si agresiva. In loc sa pastreze "tacerea" asupra retelelor invatate, acest mecanism alege sa "otraveasca" explicit rutele, marcandu-le ca fiind inaccesibile atunci cand le anunta inapoi spre sursa lor. Este o tehnica deosebit de eficienta in prevenirea buclelor de rutare, intrucat **elimina orice ambiguitate privind disponibilitatea unei rute**.
@@ -44,7 +44,7 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 
 ---
 
-### Formatul de mesaje specific RIPv2
+### <ins>Formatul de mesaje specific RIPv2</ins>
 **RIP** este un protocol bazat pe <mark>UDP</mark>. Fiecare router care foloseste RIP are un proces de rutare care trimite si primeste datagrame prin portul UDP 520, desemnat pentru RIPv1/RIPv2. Toate comunicarile destinate procesului RIP de pe un alt router sunt directionate catre acest port. Mai mult, toate mesajele de actualizare a rutarii sunt trimise de la portul RIP. Mesajele de actualizare trimise ca raspuns la o cerere sunt directionate inapoi de la portul de la care a venit cererea. Desi anumite interogari specifice pot fi trimise de la alte porturi decat portul RIP, ele trebuie directionate catre portul RIP al dispozitivului tinta.
 
 <div align="center">
@@ -85,16 +85,38 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
 </div>
 
 ---
+#### <ins>Descriere explicita a formatului de mesaje</ins> <br></br>
+- ***AFI (Address Family Identifier)*** <br></br>
+⇨ AFI specifica familia de adrese utilizata. Pentru RIPv1, doar **AF_INET (IPv4)** este suportat, cat si pentru RIPv2. <br></br>
 
+- ***Route Tag*** <br></br>
+⇨ Route Tag-ul are ca scop separarea rutelor RIP "interne" de cele "externe". Mai precis, prin termenul intern ne referim la rutele invatate de RIP de la el insusi, iar prin extern intelegem
+  ca rutele sunt procesate prin intermediul altor protocoale, de exemplu OSPF ( Open Shortest Path First ). <br></br>
 
-### Timere
+- ***IP Address*** <br></br>
+⇨ Specifica adresa IP destinatie. <br></br>
+
+- ***Subnet Mask*** <br></br>
+⇨ Acest camp contine masca de retea pentru destinatie. Daca valoarea este 0, atunci inseamna ca masca nu a fost specificata. <br></br>
+
+- ***Next Hop*** <br></br>
+⇨ Indica adresa IP al celui mai aproapiat router unde ar trebui sa fie trimisa informatia pentru a ajunge pe drumul cel mai scurt la destinatie. Daca nu se poate ajunge la acest "urmator hop", atunci acesta trebuie
+  tratat ca fiind 0.0.0.0 . <br></br>
+
+- ***Metric*** <br></br>
+⇨ Reprezinta o valoare utilizata ce indica numarul de "next hop-uri" pentru a ajung la destinatia dorita. Aceasta metrica poate avea o valoare intre 1 si 15 pentru rutele valide, <mark>16</mark> reprezentand rutele
+  indisponibile si/sau infinite. 
+  
+---
+
+### <ins>Timere</ins>
 O data la 30 de secunde, fiecare router trebuie sa-si trimita tabela de rutare catre vecini. Timer-ul nu ar trebui sa fie afectat de cat de incarcat este sistemul. Fiecare timer are un offset de un numar aleator intre 0 si 5 secunde pentru a evita sincronizarea ceasurilor.
 
 Fiecare ruta are 2 timere asociate: un timeout si un garbage-collection timer. Cand timeout-ul expira ruta nu mai este valida dar ramane in tabelul de rutare pentru a informa si vecinii. Cand expira timer-ul garbage-collection, ruta este eliminata. Timeout-ul este setat cand ruta este gasita si/sau atunci cand un mesaj de update este primit legat de ruta. Timeout-ul este de 180s. Garbage-collection este 120s.
 
 ---
 
-### Topologia exemplificata
+### <ins>Topologia exemplificata</ins>
 <div align="center">
   
 ![Topologie](/Images/Topologie.png)
@@ -103,7 +125,7 @@ Fiecare ruta are 2 timere asociate: un timeout si un garbage-collection timer. C
 
 
 
-#### Adrese IP folosite:
+#### <ins>Adrese IP folosite:</ins>
 - R01: 192.168.1.1, 192.168.2.1
 - R02: 192.168.1.2, 192.168.3.2 
 - R03: 192.168.2.3, 192.168.3.3, 192.168.4.3
@@ -119,7 +141,7 @@ Pentru facilitate, fiecare router are o adresa IP care se termina in ID-ul sau.
 
 ---
 
-### Masina virtuala
+### <ins>Masina virtuala</ins>
 Masina virtuala folosita este TinyCore, o distributie de Linux lightweight ce va tine locul routerului. In virtual box aceasta a fost configurata cu 64MB de RAM si 250MB disk.
 
 In functie de numarul routerului din topologie, fiecare masina este conectata la 2-3 retele interne, o interfata fiind rezervata pentru NAT (virtualbox pune la dispozitie 8 interfete, dar doar 4 fiind accesibile prin GUI).
@@ -132,7 +154,7 @@ Fiecare interfata are un fisier de config pentru a putea reasigna adresele IP.
 
 ---
 
-### Structura programului
+### <ins>Structura programului</ins>
 <div align="center">
 
   ![Workflow](/Images/diagrama_cod.jpg)
@@ -147,7 +169,7 @@ Al doilea proces verifica daca exista mesaje de procesat de la primul proces. Da
 
 ---
 
-#### Bibliografie
+#### <ins>Bibliografie</ins>
 
 - https://ro.wikipedia.org/wiki/RIP
 - https://community.fs.com/article/the-difference-between-ripv1-and-ripv2.html
