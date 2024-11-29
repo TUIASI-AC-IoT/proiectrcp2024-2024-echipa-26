@@ -8,4 +8,4 @@
 
 
 python3 main.py
-sleep 20
+sleep 5
