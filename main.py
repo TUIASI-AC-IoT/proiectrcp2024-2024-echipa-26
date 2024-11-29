@@ -26,13 +26,15 @@ def main():
     listener_process.start()
     sender_process.start()
 
-    listener_process.join()
-    sender_process.join()
-
     chdir('home/tc')
     details = open('info', 'w')
     toWrite = f'Listener: {listener_process.pid}\n' + f'Sender: {sender_process.pid}\n'+f'Run sudo kill -s SIGUSR1 {sender_process.pid} to display the routing table'
     details.write(toWrite)
+
+    listener_process.join()
+    sender_process.join()
+
+    
     # print(f'Listener: {listener_process.pid}')
     # print(f'Sender: {sender_process.pid}')
     # print(f'Run kill -s SIGUSR1 {sender_process.pid} to display the routing table')
