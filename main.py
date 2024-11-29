@@ -1,6 +1,6 @@
 from time import sleep, time
 from random import seed, randint
-from os import environ, listdir
+from os import environ, listdir, chdir
 from process_target import *
 
 from multiprocessing import Process, Pipe
@@ -29,7 +29,8 @@ def main():
     listener_process.join()
     sender_process.join()
 
-    details = open('home/tc/info', 'w+')
+    chdir('home/tc')
+    details = open('info', 'w')
     toWrite = f'Listener: {listener_process.pid}\n' + f'Sender: {sender_process.pid}\n'+f'Run sudo kill -s SIGUSR1 {sender_process.pid} to display the routing table'
     details.write(toWrite)
     # print(f'Listener: {listener_process.pid}')

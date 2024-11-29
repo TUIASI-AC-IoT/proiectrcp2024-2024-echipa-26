@@ -26,11 +26,11 @@ def getSockets(ipList, send=True):
     else:
         for ip in ipList:
             receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
-            receiver.bind(multicast)
             r = struct.pack("=4s4s", socket.inet_aton(multicast_ip), socket.inet_aton(ip))
             receiver.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, r)
             receiver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             receiver.setblocking(False)
+            receiver.bind(multicast)
             socketList.append(receiver)
 
     return socketList
@@ -76,7 +76,7 @@ def multicast_sender(pipe, ipList):
             data_to_print = data_to_print+f'{data[0].decode()} from {data[1]}\n'
         if time()-t>30:
             for socket in socketList:
-                socket.sendto("??", multicast)
+                socket.sendto(bytes('???', 'utf-8'), multicast)
             t=time()
         
 
