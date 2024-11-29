@@ -29,7 +29,7 @@ def getSockets(ipList, send=True):
             receiver.bind(multicast)
             r = struct.pack("=4s4s", socket.inet_aton(multicast_ip), socket.inet_aton(ip))
             receiver.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, r)
-            sender.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            receiver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             receiver.setblocking(False)
             socketList.append(receiver)
 
