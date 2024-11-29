@@ -36,7 +36,7 @@ def getSockets(ipList, send=True):
     return socketList
 
 def sigusr1_handler(table, signum, frame):
-    pass
+    print(table)
 
 def multicast_listener(pipe, ipList):
     seed(time())
