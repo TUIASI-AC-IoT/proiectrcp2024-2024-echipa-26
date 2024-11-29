@@ -38,7 +38,7 @@ def main():
 
     print(f'Listener: {listener_process.pid}')
     print(f'Sender: {sender_process.pid}')
-    print(f'Send signal <insert signal> to {sender_process.pid} to display the routing table.')
+    print(f'Run kill -s SIGUSR1 {sender_process.pid} to display the routing table')
 
 
 if __name__=="__main__":

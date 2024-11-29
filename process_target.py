@@ -3,6 +3,9 @@ from random import seed, randint
 import socket
 import struct
 import select
+from functools import partial
+
+import signal
 def getSockets(ipList, send=True):
     '''
     Return a list of sockets configured to send/listen on the multicast address for each address in ipList
@@ -31,6 +34,9 @@ def getSockets(ipList, send=True):
 
     return socketList
 
+def sigusr1_handler(table, signum, frame):
+    pass
+
 def multicast_listener(pipe, ipList):
     seed(time())
     sleep(randint(1,10))
@@ -50,6 +56,9 @@ def multicast_listener(pipe, ipList):
 
 def multicast_sender(pipe, ipList):
     socketList = getSockets(ipList, True)
+    #change data to print
+    data_to_print=0
+    signal.signal(signal.SIGUSR1, partial(sigusr1_handler, data_to_print))
     while True:
         if pipe.poll(0.05):
             #TODO
