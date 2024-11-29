@@ -1,14 +1,23 @@
 from time import sleep, time
 from random import seed, randint
-from os import environ
+from os import environ, listdir
 from process_target import *
 
 from multiprocessing import Process, Pipe
 def main():
 
-    print(environ['ID'])
-    sleep(5)
+    ipList = []
+    ID = environ['ID']
+    path = f'/home/tc/pr/r{ID}'
+    for config in listdir(path):
+        configPath = path+f'/{config}'
+        file = open(configPath)
+        lines = file.readlines()
+        ipList.append(lines[2][3:-1])
+    
+    print(ipList)
     return
+
 
 
     seed(time())
