@@ -2,5 +2,6 @@ aman2: de gandit un design elegant pentru clasa ruta
 aman2: de gandit un design elegant si eficient pentru clasa routing table
 
 update tabela
-multicast send (partial done)
-multicast listen (partial done)
+
+
+fix partial not working as expected (it passes the value not the reference)
