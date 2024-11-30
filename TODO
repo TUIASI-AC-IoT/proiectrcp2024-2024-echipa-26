@@ -5,8 +5,7 @@ update tabela
 multicast send (partial done)
 multicast listen (partial done)
 
-asaf: de citit despre fiecare camp din msg si ce inseamna efectiv si cum le folosim si cand(request, updates etc)
-asaf: informatii header de adaugat + request & response + addressing considerations (!)
+
 
 
 alex: raspuns la un semnal primit cu kill pentru a afisa tabela intr-un mod frumos
