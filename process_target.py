@@ -36,7 +36,7 @@ def multicast_listener(pipe, ipList):
 
 
 def multicast_sender(pipe, ipList):
-    socketcketList = []
+    socketList = []
 
     multicast_port = 520
     multicast_ip = '224.0.0.9'
@@ -48,6 +48,7 @@ def multicast_sender(pipe, ipList):
         sender.bind((ip, multicast_port))
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip))
+        socketList.append(sender)
 
 
     #change data to print
@@ -61,7 +62,7 @@ def multicast_sender(pipe, ipList):
             data = pipe.recv()
             data_to_print = data_to_print+f'{data[0].decode()} from {data[1]}\n'
         if time()-t>30:
-            for sock in socketcketList:
+            for sock in socketList:
                 sock.sendto(bytes('???', 'utf-8'), multicast)
                 print('sent multicast')
             t=time()
