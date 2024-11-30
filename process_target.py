@@ -36,6 +36,7 @@ def multicast_listener(pipe, ipList):
 
 
 def multicast_sender(pipe, ipList):
+    global data_to_print2
     socketList = []
 
     multicast_port = 520
