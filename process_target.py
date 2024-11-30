@@ -31,6 +31,7 @@ def multicast_listener(pipe, ipList):
         data, s = receiver.recvfrom(1024)
         sendTo = data.decode()+" from "+str(s[0])+" "+str(s[1])
         pipe.send(sendTo)
+        print("receive multicast")
                 
 
 
@@ -62,7 +63,7 @@ def multicast_sender(pipe, ipList):
         if time()-t>30:
             for sock in socketcketList:
                 sock.sendto(bytes('???', 'utf-8'), multicast)
-                print('sent')
+                print('sent multicast')
             t=time()
         
 
