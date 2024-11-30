@@ -44,26 +44,34 @@ def multicast_listener(pipe, ipList):
     #TODO
     # send req
 
-    socketList = getSockets(ipList, False)
+    multicastPort = 520
+    multicastIP = '224.0.0.9'
+    receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto =17)
+    receiver.bind((multicastIP, multicastPort))
+    for ip in ipList:
+        r = struct.pack("=4s4s", socket.inet_aton(multicastIP), socket.inet_aton(ip))
+        receiver.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, r)
 
     while True:
-        ready_to_read, _,_=select.select(socketList, [],[], 0.1)
-        if len(ready_to_read)!=0:
-            for socket in ready_to_read:
-                #receive data, convert to strings or whatever (not bytes) and send it through the pipe
-                data, s = socket.recvfrom(1024)
-                print('received')
-                pipe.send((data,s))
+        data, s = receiver.recvfrom(1024)
+        sendTo = data.decode()+" from "+str(s[0])+" "+str(s[1])
+        pipe.send(sendTo)
                 
 
 
 def multicast_sender(pipe, ipList):
-    socketList = getSockets(ipList, True)
+    socketList = []
     
     multicast_port = 520
     multicast_ip = '224.0.0.9'
     multicast = (multicast_ip, multicast_port)
-    
+    for ip in ipList:
+        sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
+        sender.bind((ip, multicast_port))
+        sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
+        sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip))
+
+
     #change data to print
     data_to_print=''
     signal.signal(signal.SIGUSR1, partial(sigusr1_handler, data_to_print))
