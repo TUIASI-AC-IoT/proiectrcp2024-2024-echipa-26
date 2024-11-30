@@ -26,11 +26,10 @@ def getSockets(ipList, send=True):
     else:
         for ip in ipList:
             receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
+            receiver.bind((ip,multicast_port))
             r = struct.pack("=4s4s", socket.inet_aton(multicast_ip), socket.inet_aton(ip))
             receiver.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, r)
-            #receiver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             receiver.setblocking(False)
-            receiver.bind((ip,multicast_port))
             socketList.append(receiver)
 
     return socketList
