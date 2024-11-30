@@ -4,8 +4,3 @@ aman2: de gandit un design elegant si eficient pentru clasa routing table
 update tabela
 multicast send (partial done)
 multicast listen (partial done)
-
-
-
-
-alex: raspuns la un semnal primit cu kill pentru a afisa tabela intr-un mod frumos
