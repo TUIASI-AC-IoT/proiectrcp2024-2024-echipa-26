@@ -7,10 +7,10 @@ from functools import partial
 import signal
 
 
-
+data_to_print2 =''
 
 def sigusr1_handler(table, signum, frame):
-    print(table)
+    print(data_to_print2)
 
 def multicast_listener(pipe, ipList):
     seed(time())
@@ -61,7 +61,7 @@ def multicast_sender(pipe, ipList):
     while True:
         if pipe.poll(0.1):
             data = pipe.recv()
-            data_to_print = data_to_print+data
+            data_to_print2 = data_to_print2+data
         if time()-t>30:
             for sock in socketList:
                 sock.sendto(bytes('???', 'utf-8'), multicast)
