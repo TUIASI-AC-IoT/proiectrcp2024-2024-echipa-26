@@ -108,6 +108,32 @@ Rutele sunt trimise periodic, insemnand ca, intr-o retea RIP, toate routerele is
   indisponibile si/sau infinite. 
   
 ---
+### <ins>Header-ul RIPv2</ins> <br></br>
+  Fiecare mesaj trimis contine un antet (header) care este alcatuit dintr-o comanda si un numar al versiunii. Campul de <mark>comanda</mark> este folosit in ambele versiuni RIP, cu scopul de a specifica intentia mesajului. <br></br>
+  - 1 - ***request*** <br></br>
+    O cerere pentru sistemul care raspunde sa trimita tot sau o parte din tabelul sau de rutare. <br></br>
+  - 2 - ***response*** <br></br>
+    Un mesaj ce contine tot sau o parte din tabelul de rutare al sistemului care a fost solicitat. Mesajul poate fi trimis in mod solicitat ca raspunsul unei cereri, sau poate fi un update nesolicitat si periodic de rutare generat de catre sursa. <br></br>
+
+  <div align ="center">
+
+      
+  
+      0                   1                   2                   3
+       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |  command (1)  |  version (1)  |       must be zero (2)        |
+      +---------------+---------------+-------------------------------+
+      |                                                               |
+      ~                         RIP Entry (20)                        ~
+      |                                                               |
+      +---------------+---------------+---------------+---------------+
+    
+  
+  
+  </div>
+  
+---
 
 ### <ins>Timere</ins>
 O data la 30 de secunde, fiecare router trebuie sa-si trimita tabela de rutare catre vecini. Timer-ul nu ar trebui sa fie afectat de cat de incarcat este sistemul. Fiecare timer are un offset de un numar aleator intre 0 si 5 secunde pentru a evita sincronizarea ceasurilor.
