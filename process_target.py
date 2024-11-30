@@ -4,35 +4,10 @@ import socket
 import struct
 import select
 from functools import partial
-
 import signal
-def getSockets(ipList, send=True):
-    '''
-    Return a list of sockets configured to send/listen on the multicast address for each address in ipList
-    '''
-    socketList = []
-    multicast_port = 520
-    multicast_ip = '224.0.0.9'
-    multicast = (multicast_ip, multicast_port)
 
-    if send:
-        for ip in ipList:
-            sender = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM, proto=17)
-            sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
-            sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip))
-            sender.setblocking(False)
-            socketList.append(sender)
 
-    else:
-        for ip in ipList:
-            receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
-            receiver.bind((ip,multicast_port))
-            r = struct.pack("=4s4s", socket.inet_aton(multicast_ip), socket.inet_aton(ip))
-            receiver.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, r)
-            receiver.setblocking(False)
-            socketList.append(receiver)
 
-    return socketList
 
 def sigusr1_handler(table, signum, frame):
     print(table)
@@ -60,11 +35,13 @@ def multicast_listener(pipe, ipList):
 
 
 def multicast_sender(pipe, ipList):
-    socketList = []
-    
+    socketcketList = []
+
     multicast_port = 520
     multicast_ip = '224.0.0.9'
     multicast = (multicast_ip, multicast_port)
+
+
     for ip in ipList:
         sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
         sender.bind((ip, multicast_port))
@@ -83,8 +60,8 @@ def multicast_sender(pipe, ipList):
             data = pipe.recv()
             data_to_print = data_to_print+f'{data[0].decode()} from {data[1]}\n'
         if time()-t>30:
-            for socket in socketList:
-                socket.sendto(bytes('???', 'utf-8'), multicast)
+            for sock in socketcketList:
+                sock.sendto(bytes('???', 'utf-8'), multicast)
                 print('sent')
             t=time()
         
