@@ -47,6 +47,7 @@ def multicast_sender(pipe, ipList):
         sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
         sender.bind((ip, multicast_port))
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
+        sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip))
         socketList.append(sender)
 
@@ -60,7 +61,7 @@ def multicast_sender(pipe, ipList):
     while True:
         if pipe.poll(0.1):
             data = pipe.recv()
-            data_to_print = data_to_print+f'{data[0].decode()} from {data[1]}\n'
+            data_to_print = data_to_print+data
         if time()-t>30:
             for sock in socketList:
                 sock.sendto(bytes('???', 'utf-8'), multicast)
