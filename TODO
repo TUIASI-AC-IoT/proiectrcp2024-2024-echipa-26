@@ -1,9 +1,4 @@
-aman2: de gandit un design elegant pentru clasa ruta
-aman2: de gandit un design elegant si eficient pentru clasa routing table
-
 update tabela
 
 asaf: de completat clasa RIPEntry -> formatul de mesaj
 asaf: functie de unpack 
-
-alex: fix partial not working as expected (it passes the value not the reference)

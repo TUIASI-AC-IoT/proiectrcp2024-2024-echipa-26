@@ -1,8 +1,9 @@
+from Timer import *
+
 class RoutingTable:
-    def __init__(self, listaRute):
-        # hashmap cu (dest,masca)-key restul fiind valoare
-        # timer de update
-        pass
+    def __init__(self):
+        self.dict = dict()
+        self.update = Timer(30*1000)
 
     def addRoute(self, route):
         pass
@@ -11,8 +12,8 @@ class RoutingTable:
         pass
 
     def __str__(self):
-        pass
+        for key, value in self.dict:
+            print(str(key)+' '+str(value))
 
     def toBytes(self):
-        
         pass

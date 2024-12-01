@@ -1,12 +1,12 @@
 import struct
-from RIPEntry import *
+
 
 
 class Message:
     '''
     RIPEntry + header
     '''
-    def __init__(self, command, version, must_be_zero, address_family_identifier, route_tag, ipv4, subnet, next_hop, metric):
+    def __init__(self, command=0, version=0, must_be_zero=0, address_family_identifier=0, route_tag=0, ipv4=0, subnet=0, next_hop=0, metric=0):
         self.command = command
         self.version = version
         self.must_be_zero = must_be_zero
@@ -18,18 +18,9 @@ class Message:
         self.metric = metric
             
     
-    # de adaugat parametrii
-    # ma gandesc daca pot sa fac mai eficient......
-    @classmethod
-    def with_ripEntry(cls, command, version, must_be_zero, ripEntry : RIPEntry):
-        return cls(command, version, must_be_zero, 
-                   ripEntry.address_family_identifier, 
-                   ripEntry.route_tag, 
-                   ripEntry.ipv4, 
-                   ripEntry.subnet, 
-                   ripEntry.next_hop, 
-                   ripEntry.metric)
-        
+
+   
+    
     def unpack_bytes(self, mesaj_impachetat):
         unpacked_data = struct.unpack('!2BH2H4I', mesaj_impachetat)
         self.command = unpacked_data[0]
@@ -44,7 +35,7 @@ class Message:
         
         
         
-    def pack_bytes(self):
+    def getBytes(self):
         
         # B - unsigned char -> 1 octet
         # H - unsigned short -> 2 octeti

@@ -1,20 +1,15 @@
-
+from Timer import *
 
 class Route:
-    def __init__(self, destinatie, masca, nextHop, sursa):
-        #destinatia
-        #masca
-        #next hop-ul
-        #metrica?
-        #sursa
+    def __init__(self, destination, mask, nextHop, source, cost):
 
-        #timer de garbage
-        #timer de timeout
-        pass
+        self.destination = destination
+        self.mask = mask
+        self.nextHop = nextHop
+        self.source = source
+        self.cost =cost
 
-    def __init__(self, message):
-        pass
+        self.garbage = Timer(120*1000)
+        self.timeout = Timer(180*1000)
 
-    #who knows
-    def __init__(self, ripentry):
-        pass
+    
