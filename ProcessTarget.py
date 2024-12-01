@@ -2,9 +2,9 @@ from time import sleep, time
 from random import seed, randint
 import socket
 import struct
-import select
-from functools import partial
 import signal
+
+from Message import *
 
 from RoutingTable import *
 
@@ -15,23 +15,24 @@ from RoutingTable import *
 def multicastListen(pipe, ipList):
     seed(time())
     sleep(randint(1,10))
-
+    multicastPort = 520
+    multicastIP = '224.0.0.9'
+    
+    #de mutat trimis-ul de request catre sender?
     for ip in ipList:
         sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
-        sender.bind((ip, 520))
+        sender.bind((ip, multicastPort))
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip))
         #build message
         sender.sendall()
         sender.close()
-    
-    #send req
-    #pipe.send(0)?
-    #build messages with requests (the ip == self?)
+        #send req
 
-    multicastPort = 520
-    multicastIP = '224.0.0.9'
+    pipe.send(0)
+
+    
     receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto =17)
     receiver.bind((multicastIP, multicastPort))
     for ip in ipList:
@@ -40,24 +41,26 @@ def multicastListen(pipe, ipList):
 
     while True:
         data, s = receiver.recvfrom(1024)
-        #data->clasa message
-        #pipe.send(OBIECT message)
+        msg = toMessage(data)
+        toSend = (msg, s[0])
+        #s - tuplu s[0]-adresa ip si s[1]-portul
+        pipe.send(toSend)
                 
 
 
 def multicastSender(pipe, ipList):
     socketList = []
 
-    multicast_port = 520
-    multicast_ip = '224.0.0.9'
-    multicast = (multicast_ip, multicast_port)
+    multicastPort = 520
+    multicastIP = '224.0.0.9'
+    multicast = (multicastIP, multicastPort)
 
-    # astept ca listener-ul sa trimita request (nu pot face bind la adresele ip pe mai multe sockets)
+    # astept ca listener-ul sa trimita request-urile (nu pot face bind la adresele ip pe mai multe sockets)
     pipe.recv()
 
     for ip in ipList:
         sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
-        sender.bind((ip, multicast_port))
+        sender.bind((ip, multicastPort))
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip))
@@ -75,8 +78,9 @@ def multicastSender(pipe, ipList):
 
     while True:
         if pipe.poll(0.05):
-            #message e obiect MESSAGE
-            message = pipe.recv()
+            # message e obiect MESSAGE
+            # source e adresa ip de la care provine mesajul
+            message, source = pipe.recv()
 
             if message.command == None:#valoare pt request in loc de None
                 # send routing table directly

@@ -17,47 +17,55 @@ class Message:
         self.next_hop = next_hop
         self.metric = metric
             
-    
-
-   
-    
-    def unpack_bytes(self, mesaj_impachetat):
-        unpacked_data = struct.unpack('!2BH2H4I', mesaj_impachetat)
-        self.command = unpacked_data[0]
-        self.version = unpacked_data[1]
-        self.must_be_zero = unpacked_data[2]
-        self.address_family_identifier = unpacked_data[3]
-        self.route_tag = unpacked_data[4]
-        self.ipv4 = unpacked_data[5]
-        self.subnet = unpacked_data[6]
-        self.next_hop = unpacked_data[7]
-        self.metric = unpacked_data[8]
-        
-        
-        
-    def getBytes(self):
-        
-        # B - unsigned char -> 1 octet
-        # H - unsigned short -> 2 octeti
-        # I - unsigned int -> 4 octeti        
-        # dimensiune totala format mesaj RIPv2 = 24 octeti 
-         
-        return struct.pack('!2BH2H4I', 
-                    self.command, # 1
-                    self.version, # 1
-                    self.must_be_zero, # 2
-                    self.address_family_identifier, # 2
-                    self.route_tag, # 2 
-                    self.ipv4, # 4
-                    self.subnet, # 4 
-                    self.next_hop, # 4
-                    self.metric) # 4  
-        
     def __str__(self):
         for eticheta , val in vars(self).items():
             print(f'{eticheta} : {val}')
             
     
+
+def toBytes(msg :Message):
+    '''
+    Converts a Message object to bytes to be sent over the network
+    '''
+
+    # B - unsigned char -> 1 octet
+    # H - unsigned short -> 2 octeti
+    # I - unsigned int -> 4 octeti        
+    # dimensiune totala format mesaj RIPv2 = 24 octeti 
+    return struct.pack('!2BH2H4I', 
+                    msg.command, # 1
+                    msg.version, # 1
+                    msg.must_be_zero, # 2
+                    msg.address_family_identifier, # 2
+                    msg.route_tag, # 2 
+                    msg.ipv4, # 4
+                    msg.subnet, # 4 
+                    msg.next_hop, # 4
+                    msg.metric) # 4  
+
+
+def toMessage(bytes:bytes):
+    '''
+    Given bytes it returns a Message object
+    '''
+
+    unpacked_data = struct.unpack('!2BH2H4I', bytes)
+    command = unpacked_data[0]
+    version = unpacked_data[1]
+    must_be_zero = unpacked_data[2]
+    address_family_identifier = unpacked_data[3]
+    route_tag = unpacked_data[4]
+    ipv4 = unpacked_data[5]
+    subnet = unpacked_data[6]
+    next_hop = unpacked_data[7]
+    metric = unpacked_data[8]
+
+    return Message(command, version,must_be_zero, address_family_identifier, route_tag, ipv4,subnet,next_hop, metric)
+
+
+
+
+
 # TEST !!!!
 #message = Message.with_ripEntry(1, 2, 0, RIPEntry(0x02, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00000000))
 #mesaj_packed = message.pack_bytes() # mesajul impachetat
