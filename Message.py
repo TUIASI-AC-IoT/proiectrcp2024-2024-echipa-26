@@ -12,6 +12,18 @@ class Message:
         self.next_hop = next_hop
         self.metric = metric
 
+    def __init__(self, bytes):
+        self.command = struct.unpack('=2BH2H4I', bytes)[0]
+        self.version = struct.unpack('=2BH2H4I', bytes)[1]
+        self.must_be_zero = struct.unpack('=2BH2H4I', bytes)[2]
+        self.address_family_identifier = struct.unpack('=2BH2H4I', bytes)[3]
+        self.route_tag = struct.unpack('=2BH2H4I', bytes)[4]
+        self.ipv4 = struct.unpack('=2BH2H4I', bytes)[5]
+        self.subnet = struct.unpack('=2BH2H4I', bytes)[6]
+        self.next_hop = struct.unpack('=2BH2H4I', bytes)[7]
+        self.metric = struct.unpack('=2BH2H4I', bytes)[8]
+        
+        
     def to_bytes(self):
         '''
          B - unsigned char -> 1 octet
@@ -31,4 +43,4 @@ class Message:
                     self.next_hop, # 4
                     self.metric) # 4
 
-    
+        

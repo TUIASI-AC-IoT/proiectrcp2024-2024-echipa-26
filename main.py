@@ -2,7 +2,7 @@ from time import sleep, time
 from random import seed, randint
 from os import environ, listdir, chdir
 from process_target import *
-
+from Message import *
 from multiprocessing import Process, Pipe
 def main():
 
@@ -43,3 +43,4 @@ def main():
 
 if __name__=="__main__":
     main()
+    
