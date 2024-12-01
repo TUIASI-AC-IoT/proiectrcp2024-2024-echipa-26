@@ -14,4 +14,6 @@ class RIPEntry:
         self.metric = metric
 
     def __str__(self):
-        pass
+        for eticheta, val in vars(self).items():
+            print(f'{eticheta} : {val}')
+
