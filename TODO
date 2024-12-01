@@ -3,5 +3,7 @@ aman2: de gandit un design elegant si eficient pentru clasa routing table
 
 update tabela
 
+asaf: de completat clasa RIPEntry -> formatul de mesaj
+asaf: functie de unpack 
 
-fix partial not working as expected (it passes the value not the reference)
+alex: fix partial not working as expected (it passes the value not the reference)

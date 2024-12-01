@@ -1,6 +1,11 @@
 import struct
+from RIPEntry import *
+
 
 class Message:
+    '''
+    RIPEntry + header
+    '''
     def __init__(self, command, version, must_be_zero, address_family_identifier, route_tag, ipv4, subnet, next_hop, metric):
         self.command = command
         self.version = version
@@ -11,6 +16,12 @@ class Message:
         self.subnet =  subnet
         self.next_hop = next_hop
         self.metric = metric
+
+        
+
+    #de adaugat parametrii
+    def __init__(self, ripEntry):
+        pass
 
     def __init__(self, bytes):
         self.command = struct.unpack('=2BH2H4I', bytes)[0]
@@ -41,6 +52,4 @@ class Message:
                     self.ipv4, # 4
                     self.subnet, # 4 
                     self.next_hop, # 4
-                    self.metric) # 4
-
-        
+                    self.metric) # 4        
