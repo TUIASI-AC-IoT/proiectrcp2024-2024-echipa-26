@@ -6,14 +6,14 @@ from Message import *
 from multiprocessing import Process, Pipe
 def main():
 
-    ipList = []
+    ipList = [] # lista de tuple
     ID = environ['ID']
     path = f'/home/tc/pr/cfg/r{ID}'
     for config in listdir(path):
         configPath = path+f'/{config}'
         file = open(configPath)
         lines = file.readlines()
-        ipList.append(lines[2][3:-1])
+        ipList.append((lines[2][3:-1],lines[3][7:-1]))
 
     #read cfg (timers etc)
     

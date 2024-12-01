@@ -1,6 +1,6 @@
 import struct
 
-
+#TO BE DELETED LATER
 
 class Message:
     '''
