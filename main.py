@@ -30,7 +30,7 @@ def main():
 
     chdir('/home/tc')
     details = open('info', 'w')
-    toWrite = f'Main: {getpid()}\n'+'Listener: {listenerProcess.pid}\n' + f'Sender: {senderProcess.pid}\n'+f'Run sudo kill -s SIGUSR1 {senderProcess.pid} to display the routing table\n'
+    toWrite = f'Main: {getpid()}\n'+f'Listener: {listenerProcess.pid}\n' + f'Sender: {senderProcess.pid}\n'+f'Run sudo kill -s SIGUSR1 {senderProcess.pid} to display the routing table\n'
     details.write(toWrite)
     details.close()
 

@@ -25,12 +25,12 @@ def multicastListen(pipe, ipList):
     for ip in ipList:
         sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
         sender.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sender.bind((ip, multicastPort))
+        sender.bind((ip[0], multicastPort))
         socketList.append(sender)
     receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto =17)
     receiver.bind((multicastIP, multicastPort))
     for ip in ipList:
-        r = struct.pack("=4s4s", socket.inet_aton(multicastIP), socket.inet_aton(ip))
+        r = struct.pack("=4s4s", socket.inet_aton(multicastIP), socket.inet_aton(ip[0]))
         receiver.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, r)
     socketList.append(receiver)
 
