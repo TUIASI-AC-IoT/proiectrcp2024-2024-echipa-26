@@ -118,5 +118,5 @@ def multicastSender(pipe, ipList):
             for socket in socketDict.items():
                 msg = bytes(f'i', 'ascii')
                 socket.sendto(msg, multicast)
-            i+=1
+            i=i+1
             t=time()
