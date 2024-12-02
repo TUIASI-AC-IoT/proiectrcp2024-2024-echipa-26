@@ -7,10 +7,10 @@ class Timer:
     '''
     def __init__(self, timeout):
         '''
-        timeout - ms
+        timeout - s
         '''
         self.timeout = timeout
-        self.timer = time()*1000
+        self.timer = time()
 
     def isValid(self):
         if time()*1000-self.timer > self.timeout:
@@ -18,4 +18,4 @@ class Timer:
         return True
     
     def reset(self):
-        self.timer = time()*1000
+        self.timer = time()

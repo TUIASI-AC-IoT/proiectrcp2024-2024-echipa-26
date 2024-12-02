@@ -1,29 +1,19 @@
 import struct
 
-#TO BE DELETED LATER
+
 
 class Message:
     '''
-    RIPEntry + header
+    RIPEntries + header
     '''
-    def __init__(self, command=0, version=0, must_be_zero=0, address_family_identifier=0, route_tag=0, ipv4=0, subnet=0, next_hop=0, metric=0):
+    def __init__(self, command, version, entries:list):
         self.command = command
         self.version = version
-        self.must_be_zero = must_be_zero
-        self.address_family_identifier = address_family_identifier
-        self.route_tag = route_tag
-        self.ipv4 = ipv4
-        self.subnet = subnet
-        self.next_hop = next_hop
-        self.metric = metric
-            
-    def __str__(self):
-        for eticheta , val in vars(self).items():
-            print(f'{eticheta} : {val}')
+        self.entries = entries
             
     
-
-def toBytes(msg :Message):
+#TODO
+def messageToBytes(msg :Message):
     '''
     Converts a Message object to bytes to be sent over the network
     '''
@@ -43,8 +33,8 @@ def toBytes(msg :Message):
                     msg.next_hop, # 4
                     msg.metric) # 4  
 
-
-def toMessage(bytes:bytes):
+#TODO
+def bytesToMessage(bytes:bytes):
     '''
     Given bytes it returns a Message object
     '''
