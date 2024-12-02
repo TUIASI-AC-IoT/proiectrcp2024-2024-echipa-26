@@ -29,6 +29,16 @@ def multicastListen(pipe, ipList):
         receiver.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, r)
     socketList.append(receiver)
 
+
+    while True:
+        ready_to_read, _,_ = select.select(socketList,[],[], 0.1)
+        for receiver in ready_to_read:
+            data,s = receiver.recvfrom(1024)
+            key = receiver.getsockname()[0]
+            msg = data.decode('ascii')
+            toSend = (msg, s[0], key)
+            pipe.send(toSend)
+
     while True:
         ready_to_read, _,_ = select.select(socketList,[],[], 0.1)
         for receiver in ready_to_read:
@@ -65,10 +75,14 @@ def multicastSender(pipe, ipList):
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip[0]))
         #TODO: build a request and send it
+        req = bytes('Hello', 'ascii')
+        sender.sendto(req, multicast)
         socketDict[ip[0]] = sender
 
     
 
+
+    routingTable = ''
     def sigUSR1(signum, frame):
         global routingTable
         print(routingTable)
@@ -76,24 +90,33 @@ def multicastSender(pipe, ipList):
     
     signal.signal(signal.SIGUSR1, sigUSR1)
     
-
+    t = time()
     while True:
         if pipe.poll(0.05):
             message, source, key = pipe.recv()
-
+            if message == 'Hello':
+                socketDict[key].sendto(bytes('REQ RESPONSE', 'ascii'), source)
+            routingTable= routingTable+f'MSG:{message} from {source} to {key}'
             
 
             
-            if message.command == Commands.REQUEST:
-                data = None # build a message from the routing table
-                socketDict[key].sendto(data, source)
+            # if message.command == Commands.REQUEST:
+            #     data = None # build a message from the routing table
+            #     socketDict[key].sendto(data, source)
                 
                 
             
-            if message.command == Commands.RESPONSE:
-                # update the routing table accordingly
-                pass
-            
+            # if message.command == Commands.RESPONSE:
+            #     # update the routing table accordingly
+            #     pass
+        
         # routing table check routes timers
 
         # routing table check timer
+        i = 0
+        if time()-t>30:
+            for socket in socketDict.items():
+                msg = bytes(f'i', 'ascii')
+                socket.sendto(msg, multicast)
+            i+=1
+            t=time()
