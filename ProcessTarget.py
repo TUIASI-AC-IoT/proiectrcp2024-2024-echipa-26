@@ -61,6 +61,7 @@ def multicastListen(pipe, ipList):
 
 def multicastSender(pipe, ipList):
     seed(time())
+    
     sleep(randint(1,10))
 
 
@@ -115,8 +116,8 @@ def multicastSender(pipe, ipList):
         # routing table check timer
         i = 0
         if time()-t>30:
-            for socket in socketDict.items():
+            for socketC in socketDict.items():
                 msg = bytes(f'i', 'ascii')
-                socket.sendto(msg, multicast)
+                socketC.sendto(msg, multicast)
             i=i+1
             t=time()
