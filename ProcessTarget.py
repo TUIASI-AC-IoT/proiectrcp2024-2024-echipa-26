@@ -4,7 +4,7 @@ import socket
 import struct
 import signal
 import select
-from Message import *
+
 
 from RoutingTable import *
 from RIPEntry import *
@@ -13,7 +13,6 @@ from RIPEntry import *
 multicastPort = 520
 multicastIP = '224.0.0.9'
     
-#TODO WIP
 def multicastListen(pipe, ipList):
     seed(time())
     sleep(randint(1,10))
@@ -36,16 +35,12 @@ def multicastListen(pipe, ipList):
 
     while True:
         ready_to_read, _,_ = select.select(socketList,[],[], 0.1)
-
         for receiver in ready_to_read:
             data, s = receiver.recvfrom(1024)
-            msg = toMessage(data)
+            msg = messageToEntries(data)
             toSend = (msg, s[0])
-            #s - tuplu s[0]-adresa ip si s[1]-portul
             pipe.send(toSend)
                 
-
-
 def multicastSender(pipe, ipList):
     socketDict = dict()
     multicast = (multicastIP, multicastPort)
@@ -56,6 +51,9 @@ def multicastSender(pipe, ipList):
         sender.bind((ip[0], multicastPort))
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
+
+        
+
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip[0]))
         socketDict[ip] = sender
 
@@ -73,15 +71,24 @@ def multicastSender(pipe, ipList):
         if pipe.poll(0.05):
             message, source = pipe.recv()
 
-            if message.command == Commands.REQUEST:
-                # cum selectez socket-ul?
-                sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
-                sender.bind(('', multicastPort))
-                data = None
-                sender.sendto(data, (source,multicastPort))
+            msgType = message[1][0]
+            msgVersion = message[1][1]
+            msgEntries = message[0]
+
+            
+            if msgType == Commands.REQUEST:
+                selectedSocket = None
+                for ip in socketDict:
+                    if ip[0] == source:
+                        selectedSocket = socketDict[ip]
+                        break
+
+                data = routingTable.toMessage(Commands.REQUEST, Versions.V2)
+                selectedSocket.sendto(data, (source, multicastPort))
+                
                 
             
-            if message.command == Commands.RESPONSE:
+            if msgType == Commands.RESPONSE:
                 # update the routing table accordingly
                 pass
             

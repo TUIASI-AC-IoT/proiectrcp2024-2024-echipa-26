@@ -5,15 +5,8 @@ class RoutingTable:
         self.dict = dict()
         self.update = Timer(30*1000)
 
-    def addRoute(self, route):
+    def addEntries(self, list):
         pass
 
-    def updateRoute(self, key, route):
-        pass
-
-    def __str__(self):
-        for key, value in self.dict:
-            print(str(key)+' '+str(value))
-
-    def toBytes(self):
+    def checkTimers(self):
         pass

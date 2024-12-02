@@ -15,6 +15,7 @@ def main():
         lines = file.readlines()
         ipList.append((lines[2][3:-1],lines[3][7:-1]))
 
+    #TODO cfg
     #read cfg (timers etc)
     
     

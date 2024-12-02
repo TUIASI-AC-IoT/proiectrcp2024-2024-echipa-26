@@ -14,9 +14,11 @@ class Route:
 
     
 def RIPEntryToRoute(entry:RIPEntry)->Route:
+    #TODO
     pass
 
-def RIPEntriesToRoutes(entries:list[RIPEntry])->list[Route]:
+def RIPEntriesToRoutes(entries:list)->list:
+    #TODO
     pass
 
     
