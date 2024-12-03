@@ -120,7 +120,7 @@ def multicastSender(pipe, ipList):
         # routing table check timer
         
         if time()-t>30:
-            for socketC in socketDict.items():
+            for socketC in socketDict:
                 msg = Message(Commands.RESPONSE, Versions.V2, table)
                 msg = messageToBytes(msg)
                 print('Am trimis ceva pe multicast.')
