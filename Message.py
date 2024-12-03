@@ -27,7 +27,7 @@ def messageToBytes(msg :Message):
     group = struct.pack("!2BH", msg.command, msg.version, 0)
     ripArr.append(group)
     for entry in msg.entries:
-        r = entry.toBytes()
+        r = RIPtoBytes(entry)
         ripArr.append(r)
 
 
