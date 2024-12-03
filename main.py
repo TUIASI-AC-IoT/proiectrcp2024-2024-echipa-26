@@ -30,19 +30,15 @@ def main():
     senderProcess.start()
 
     chdir('/home/tc')
-    details = open('info', 'w')
-    toWrite = f'Main: {getpid()}\n'+f'Listener: {listenerProcess.pid}\n' + f'Sender: {senderProcess.pid}\n'+f'Run sudo kill -s SIGUSR1 {senderProcess.pid} to display the routing table\n'
-    details.write(toWrite)
-    details.close()
-
+    
     bashrc = open('.ashrc', 'a')
     toWrite = f'\nalias stop=\"sudo kill {listenerProcess.pid} {senderProcess.pid} {getpid()}\"\n'
     toWrite = toWrite+f'alias show=\"sudo kill -s sigusr1 {senderProcess.pid}\"\n'
+    toWrite = toWrite + 'stop=kill\nshow=display table\n'
     bashrc.write(toWrite)
     bashrc.close()
 
-    system("source /home/tc/.ashrc")
-    system("echo DONE")
+    system("echo \"run source ~/.ashrc\"")
 
     
 
