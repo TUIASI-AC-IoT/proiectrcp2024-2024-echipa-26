@@ -35,6 +35,13 @@ def main():
     details.write(toWrite)
     details.close()
 
+    bashrc = open('.ashrc', 'a')
+    toWrite = f'\"alias stop=sudo kill {listenerProcess.pid} {senderProcess.pid} {getpid()}\n\"'
+    toWrite = toWrite+f'\"alias show=sudo kill -s sigusr1 {senderProcess.pid}\"'
+    bashrc.write(toWrite)
+    bashrc.close()
+
+
     listenerProcess.join()
     senderProcess.join()
 
