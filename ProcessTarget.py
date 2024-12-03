@@ -12,8 +12,7 @@ multicastPort = 520
 multicastIP = '224.0.0.9'
     
 def multicastListen(pipe, ipList):
-    multicastPort = 520
-    multicastIP = '224.0.0.9'
+    
     socketList =[]
 
     #sockets pt raspunsuri trimise direct
@@ -21,10 +20,16 @@ def multicastListen(pipe, ipList):
         sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
         sender.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sender.bind((ip[0], multicastPort))
-        r = struct.pack("=4s4s", socket.inet_aton(multicastIP), socket.inet_aton(ip[0]))
-        sender.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, r)
         socketList.append(sender)
     
+    receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
+    receiver.bind((multicastIP, multicastPort))
+
+    for ip in ipList:
+        r = struct.pack("=4s4s", socket.inet_aton(multicastIP), socket.inet_aton(ip[0]))
+        receiver.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, r)
+
+    socketList.append(receiver)
 
 
     
@@ -101,7 +106,7 @@ def multicastSender(pipe, ipList):
                 data = Message(Commands.RESPONSE, Versions.V2, table)
                 data = messageToBytes(data)
                 print(f'Am raspuns la request pe socket-ul {key}')
-                socketDict[key].sendto(data, source)
+                socketDict[key].sendto(data, message.entries[0].ip)
                 
                 
             
