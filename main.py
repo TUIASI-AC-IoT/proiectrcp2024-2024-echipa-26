@@ -36,8 +36,8 @@ def main():
     details.close()
 
     bashrc = open('.ashrc', 'a')
-    toWrite = f'\n\"alias stop=sudo kill {listenerProcess.pid} {senderProcess.pid} {getpid()}\"\n'
-    toWrite = toWrite+f'\"alias show=sudo kill -s sigusr1 {senderProcess.pid}\"\n'
+    toWrite = f'\nalias stop=\"sudo kill {listenerProcess.pid} {senderProcess.pid} {getpid()}\"\n'
+    toWrite = toWrite+f'alias show=\"sudo kill -s sigusr1 {senderProcess.pid}\"\n'
     bashrc.write(toWrite)
     bashrc.close()
 
