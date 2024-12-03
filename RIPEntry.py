@@ -21,18 +21,18 @@ class RIPEntry:
     def __str__(self):
         return self.ip+' '+self.subnet+' '+self.nextHop
 
-    def toBytes(self):
-        arr =[]
-        arr.append(struct.pack('!2H', self.AF_id, self.routeTag))
+def RIPtoBytes(RIPentry):
+    arr =[]
+    arr.append(struct.pack('!2H', RIPEntry.AF_id, RIPEntry.routeTag))
 
-        arr.append(socket.inet_aton(self.ip))
-        arr.append(socket.inet_aton(self.subnet))
-        arr.append(socket.inet_aton(self.nextHop))
+    arr.append(socket.inet_aton(RIPEntry.ip))
+    arr.append(socket.inet_aton(RIPEntry.subnet))
+    arr.append(socket.inet_aton(RIPEntry.nextHop))
 
-        arr.append(struct.pack('!I', self.metric))
-        return b''.join(arr)
+    arr.append(struct.pack('!I', RIPEntry.metric))
+    return b''.join(arr)
     
-def unpackBytes(bytes : bytes):
+def bytesToRIP(bytes : bytes):
 
     unpacked_data = struct.unpack('!2H4I', bytes)
     address_family_identifier = unpacked_data[0]

@@ -1,18 +1,18 @@
 import struct
-
-
+from RIPEntry import * 
 
 class Message:
     '''
     RIPEntries + header
     '''
-    def __init__(self, command, version, entries:list):
+    def __init__(self, command, version, RIPentries:list):
         self.command = command
         self.version = version
-        self.entries = entries
+        self.entries = RIPentries
             
     
-#TODO
+
+
 def messageToBytes(msg :Message):
     '''
     Converts a Message object to bytes to be sent over the network
@@ -22,35 +22,41 @@ def messageToBytes(msg :Message):
     # H - unsigned short -> 2 octeti
     # I - unsigned int -> 4 octeti        
     # dimensiune totala format mesaj RIPv2 = 24 octeti 
-    return struct.pack('!2BH2H4I', 
-                    msg.command, # 1
-                    msg.version, # 1
-                    msg.must_be_zero, # 2
-                    msg.address_family_identifier, # 2
-                    msg.route_tag, # 2 
-                    msg.ipv4, # 4
-                    msg.subnet, # 4 
-                    msg.next_hop, # 4
-                    msg.metric) # 4  
+    
+    ripArr = []
+    group = struct.pack("!2BH", msg.command, msg.version, 0)
+    ripArr.append(group)
+    for entry in msg.entries:
+        r = entry.toBytes()
+        ripArr.append(r)
 
-#TODO
+
+    return b''.join(ripArr)
+
+
+
+
+
 def bytesToMessage(bytes:bytes):
     '''
     Given bytes it returns a Message object
     '''
+    header = bytes[0:4]
+    ripEntry = []
+    unpacked_data = struct.unpack("!2BH", header)
+    n = (len(bytes) - 4)//20
+    
+    for i in range(0,n):
+        ent = bytes[4+i*20:4+(i+1)*20]
+        ent = bytesToRIP(ent)
+        ripEntry.append(ent)
 
-    unpacked_data = struct.unpack('!2BH2H4I', bytes)
-    command = unpacked_data[0]
-    version = unpacked_data[1]
-    must_be_zero = unpacked_data[2]
-    address_family_identifier = unpacked_data[3]
-    route_tag = unpacked_data[4]
-    ipv4 = unpacked_data[5]
-    subnet = unpacked_data[6]
-    next_hop = unpacked_data[7]
-    metric = unpacked_data[8]
+    
+    return Message(unpacked_data[0], unpacked_data[1], ripEntry)
 
-    return Message(command, version,must_be_zero, address_family_identifier, route_tag, ipv4,subnet,next_hop, metric)
+
+
+
 
 
 
