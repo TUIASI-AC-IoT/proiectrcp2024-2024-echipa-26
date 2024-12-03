@@ -39,8 +39,8 @@ def multicastListen(pipe, ipList):
             data, s = receiver.recvfrom(1024)
             key = receiver.getsockname()[0]
             msg = bytesToMessage(data)
-            toSend = (msg, s[0],key)
-            print(f'Am primit ceva de la {s[0]} pe socket-ul {key}.')
+            toSend = (msg, s[0])
+            print(f'Am primit ceva de la {s[0]}.')
             pipe.send(toSend)
 
 
@@ -66,7 +66,7 @@ def multicastSender(pipe, ipList):
         table.append(r)
 
 
-    socketDict = dict()
+    socketDict = []
     multicast = (multicastIP, multicastPort)
 
     for ip in ipList:
@@ -80,14 +80,14 @@ def multicastSender(pipe, ipList):
         req = messageToBytes(req)
         sender.sendto(req, multicast)
         print(f'Am trimis prin multicast un request pe socket-ul {ip[0]}')
-        socketDict[ip[0]] = sender
+        socketDict.append(sender)
 
     
 
 
     
     def sigUSR1(signum, frame):
-        global table
+        
         print(table)
         pass
     
@@ -96,7 +96,7 @@ def multicastSender(pipe, ipList):
     t = time()
     while True:
         if pipe.poll(0.05):
-            message, source, key = pipe.recv()
+            message, source = pipe.recv()
             
             
 
@@ -104,11 +104,8 @@ def multicastSender(pipe, ipList):
             if message.command == Commands.REQUEST:
                 data = Message(Commands.RESPONSE, Versions.V2, table)
                 data = messageToBytes(data)
-                print(f'Am raspuns la request pe socket-ul {key}')
-                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
-                s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-                s.bind(('', 520))
-                s.sendto(data, (source, 520))
+                print(f'Am raspuns la request de la {source}')
+                socketDict[0].sendto(data,(source, 520) )
 
                 
                 
