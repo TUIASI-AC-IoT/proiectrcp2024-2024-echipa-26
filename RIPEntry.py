@@ -37,9 +37,9 @@ def bytesToRIP(bytes : bytes):
     unpacked_data = struct.unpack('!2H4I', bytes)
     address_family_identifier = unpacked_data[0]
     route_tag = unpacked_data[1]
-    ipv4 = socket.inet_ntoa(unpacked_data[2].to_bytes(4))
-    subnet = socket.inet_ntoa(unpacked_data[3].to_bytes(4))
-    next_hop = socket.inet_ntoa(unpacked_data[4].to_bytes(4)) 
+    ipv4 = socket.inet_ntoa(unpacked_data[2].to_bytes(4, 'big'))
+    subnet = socket.inet_ntoa(unpacked_data[3].to_bytes(4, 'big'))
+    next_hop = socket.inet_ntoa(unpacked_data[4].to_bytes(4,'big')) 
     metric = unpacked_data[5]
     return RIPEntry(AF_id=address_family_identifier, ip= ipv4, subnet= subnet, nextHop= next_hop, metric = metric, routeTag= route_tag)
 
