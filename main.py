@@ -41,7 +41,8 @@ def main():
     bashrc.write(toWrite)
     bashrc.close()
 
-    system("reset")
+    system("source ~/.ashrc")
+    system("echo DONE")
 
     
 
