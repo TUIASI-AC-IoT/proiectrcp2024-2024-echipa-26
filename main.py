@@ -1,6 +1,6 @@
 from time import sleep, time
 from random import seed, randint
-from os import environ, listdir, chdir, getpid
+from os import environ, listdir, chdir, getpid, system
 from ProcessTarget import *
 from Message import *
 from multiprocessing import Process, Pipe
@@ -40,6 +40,10 @@ def main():
     toWrite = toWrite+f'\"alias show=sudo kill -s sigusr1 {senderProcess.pid}\"\n'
     bashrc.write(toWrite)
     bashrc.close()
+
+    system("reset")
+
+    
 
 
     listenerProcess.join()
