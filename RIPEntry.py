@@ -19,7 +19,7 @@ class RIPEntry:
         self.routeTag = routeTag
 
     def __str__(self):
-        return ip+nextHop
+        return self.ip+self.nextHop
 
 def RIPtoBytes(RIPentry):
     arr =[]
