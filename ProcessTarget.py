@@ -88,7 +88,8 @@ def multicastSender(pipe, ipList):
     
     def sigUSR1(signum, frame):
         
-        print(table)
+        for i in table:
+            print(i)
         pass
     
     signal.signal(signal.SIGUSR1, sigUSR1)
@@ -117,7 +118,7 @@ def multicastSender(pipe, ipList):
         # routing table check routes timers
 
         # routing table check timer
-        t = time()
+        
         if time()-t>30:
             for socketC in socketDict.items():
                 msg = Message(Commands.RESPONSE, Versions.V2, table)
