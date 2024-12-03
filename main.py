@@ -34,7 +34,7 @@ def main():
     bashrc = open('.ashrc', 'a')
     toWrite = f'\nalias stop=\"sudo kill {listenerProcess.pid} {senderProcess.pid} {getpid()}\"\n'
     toWrite = toWrite+f'alias show=\"sudo kill -s sigusr1 {senderProcess.pid}\"\n'
-    toWrite = toWrite + 'stop=kill\nshow=display table\n'
+    toWrite = toWrite + 'echo \"stop=kill\"\necho \"show=display table\"\n'
     bashrc.write(toWrite)
     bashrc.close()
 
