@@ -76,7 +76,6 @@ def multicastSender(pipe, ipList):
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip[0]))
-        #TODO: build a request and send it
         req = Message(Commands.REQUEST, Versions.V2, table)
         req = messageToBytes(req)
         sender.sendto(req, multicast)
@@ -106,7 +105,11 @@ def multicastSender(pipe, ipList):
                 data = Message(Commands.RESPONSE, Versions.V2, table)
                 data = messageToBytes(data)
                 print(f'Am raspuns la request pe socket-ul {key}')
-                socketDict[message.entries[0].ip].sendto(data, message.entries[0].ip)
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
+                s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                s.bind(('', 520))
+                s.sendto(data, (source, 520))
+
                 
                 
             
