@@ -21,15 +21,15 @@ class RIPEntry:
     def __str__(self):
         return self.ip+self.nextHop
 
-def RIPtoBytes(RIPentry):
+def RIPtoBytes(RIPent):
     arr =[]
-    arr.append(struct.pack('!2H', RIPEntry.AF_id, RIPEntry.routeTag))
+    arr.append(struct.pack('!2H', RIPent.AF_id, RIPent.routeTag))
 
-    arr.append(socket.inet_aton(RIPEntry.ip))
-    arr.append(socket.inet_aton(RIPEntry.subnet))
-    arr.append(socket.inet_aton(RIPEntry.nextHop))
+    arr.append(socket.inet_aton(RIPent.ip))
+    arr.append(socket.inet_aton(RIPent.subnet))
+    arr.append(socket.inet_aton(RIPent.nextHop))
 
-    arr.append(struct.pack('!I', RIPEntry.metric))
+    arr.append(struct.pack('!I', RIPent.metric))
     return b''.join(arr)
     
 def bytesToRIP(bytes : bytes):
