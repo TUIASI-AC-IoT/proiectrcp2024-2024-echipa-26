@@ -106,7 +106,7 @@ def multicastSender(pipe, ipList):
                 data = Message(Commands.RESPONSE, Versions.V2, table)
                 data = messageToBytes(data)
                 print(f'Am raspuns la request pe socket-ul {key}')
-                socketDict[key].sendto(data, message.entries[0].ip)
+                socketDict[message.entries[0].ip].sendto(data, message.entries[0].ip)
                 
                 
             
