@@ -57,11 +57,11 @@ def multicastSender(pipe, ipList):
     
     sleep(randint(1,10))
 
-    table = {}
+    table = set()
 
     for ip in ipList:
         r = RIPEntry(ip = ip[0], subnet =ip[1], nextHop =ip[0], metric=0)
-        table.append(r)
+        table.add(r)
 
 
     socketDict = []
@@ -109,7 +109,7 @@ def multicastSender(pipe, ipList):
             
             if message.command == Commands.RESPONSE:
                 for i in message.entries:
-                    table.append(i)
+                    table.add(i)
         
         # routing table check routes timers
 
