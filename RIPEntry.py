@@ -18,6 +18,17 @@ class RIPEntry:
         self.metric = metric
         self.routeTag = routeTag
 
+    def __eq__(self, other):
+        return (self.AF_id == other.AF_id and 
+                self.ip == other.ip and 
+                self.subnet == other.subnet and 
+                self.nextHop == other.nextHop and 
+                self.metric == other.metric and 
+                self.routeTag == other.routeTag)
+    
+    def __hash__(self):
+        return hash((self.AF_id, self.ip, self.subnet, self.nextHop, self.metric,self.routeTag))
+
     def __str__(self):
         return f'To: {self.ip} {self.subnet}: {self.nextHop}, cost: {self.metric}'
 
