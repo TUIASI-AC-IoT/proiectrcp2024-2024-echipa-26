@@ -38,7 +38,7 @@ def main():
     bashrc.write(toWrite)
     bashrc.close()
 
-    system("echo \"run source ~/.ashrc\"")
+    system("echo \"run source ~/.ashrc\n\"")
 
     
 
