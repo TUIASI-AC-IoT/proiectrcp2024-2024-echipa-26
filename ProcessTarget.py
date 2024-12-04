@@ -37,10 +37,8 @@ def multicastListen(pipe, ipList):
         ready_to_read, _,_ = select.select(socketList,[],[], 0.1)
         for receiver in ready_to_read:
             data, s = receiver.recvfrom(1024)
-            key = receiver.getsockname()[0]
             msg = bytesToMessage(data)
             toSend = (msg, s[0])
-            print(f'Am primit ceva de la {s[0]}.')
             pipe.send(toSend)
 
 
@@ -79,7 +77,6 @@ def multicastSender(pipe, ipList):
         req = Message(Commands.REQUEST, Versions.V2, table)
         req = messageToBytes(req)
         sender.sendto(req, multicast)
-        print(f'Am trimis prin multicast un request pe socket-ul {ip[0]}')
         socketDict.append(sender)
 
     
@@ -105,7 +102,6 @@ def multicastSender(pipe, ipList):
             if message.command == Commands.REQUEST:
                 data = Message(Commands.RESPONSE, Versions.V2, table)
                 data = messageToBytes(data)
-                print(f'Am raspuns la request de la {source}')
                 socketDict[0].sendto(data,(source, 520) )
 
                 
@@ -123,6 +119,5 @@ def multicastSender(pipe, ipList):
             for socketC in socketDict:
                 msg = Message(Commands.RESPONSE, Versions.V2, table)
                 msg = messageToBytes(msg)
-                print('Am trimis ceva pe multicast.')
                 socketC.sendto(msg, multicast)
             t=time()
