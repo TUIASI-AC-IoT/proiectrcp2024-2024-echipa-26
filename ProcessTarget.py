@@ -57,7 +57,7 @@ def multicastSender(pipe, ipList):
     
     sleep(randint(1,10))
 
-    table = []
+    table = {}
 
     for ip in ipList:
         r = RIPEntry(ip = ip[0], subnet =ip[1], nextHop =ip[0], metric=0)
