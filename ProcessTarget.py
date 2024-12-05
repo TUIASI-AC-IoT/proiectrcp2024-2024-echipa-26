@@ -102,7 +102,7 @@ def multicastSender(pipe, ipList):
             if message.command == Commands.REQUEST:
                 data = Message(Commands.RESPONSE, Versions.V2, table)
                 data = messageToBytes(data)
-                print('Am primit req de la:'+str(source))
+                #print('Am primit req de la:'+str(source))
                 socketDict[0].sendto(data,(source, 520) )
 
                 
