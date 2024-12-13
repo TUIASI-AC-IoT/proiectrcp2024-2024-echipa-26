@@ -42,19 +42,18 @@ def send():
 
     socketDict = []
     multicast = (multicastIP, multicastPort)
-
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind(('', multicastPort))
+    s.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
+    s.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
     for ip in sendIP:
-        sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
-        sender.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sender.bind((ip, multicastPort))
-        sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
-        sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
-        sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip))
+        s.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip))
         
-        socketDict.append(sender)
-    for s in socketDict: 
-        s.sendto(bytes('hey', 'ascii'), (listenIP[0], multicastPort))
-        s.sendto(bytes('multicast', 'ascii'), (multicastIP, multicastPort))
+        
+    
+    s.sendto(bytes('hey', 'ascii'), (listenIP[0], multicastPort))
+    s.sendto(bytes('multicast', 'ascii'), (multicastIP, multicastPort))
         
 
 if __name__=="__main__":
