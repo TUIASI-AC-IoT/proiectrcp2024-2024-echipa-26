@@ -10,7 +10,7 @@ class Versions:
     V2 = 2
 
 class RIPEntry:
-    def __init__(self, AF_id=socket.AF_INET, ip='', subnet='', nextHop='', metric=0, routeTag=0):
+    def __init__(self, AF_id=socket.AF_INET, ip='0.0.0.0', subnet='0.0.0.0', nextHop='0.0.0.0', metric=0, routeTag=0):
         self.AF_id = AF_id
         self.ip = ip
         self.subnet = subnet

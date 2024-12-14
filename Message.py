@@ -56,20 +56,3 @@ def bytesToMessage(bytes:bytes):
 
 
 
-
-
-
-
-
-
-# TEST !!!!
-#message = Message.with_ripEntry(1, 2, 0, RIPEntry(0x02, 0x00, 0x00000000, 0x00000000, 0x00000000, 0x00000000))
-#mesaj_packed = message.pack_bytes() # mesajul impachetat
-#message.__str__() # afisez sa vad etichetele si valorile
-#print(mesaj_packed) # vad cum arata mesajul impachetat
-
-#message2 = Message(0, 0, 0, 0, 0, 0, 0, 0, 0)
-#message2.unpack_bytes(mesaj_packed)
-#message2.__str__()
-
-
