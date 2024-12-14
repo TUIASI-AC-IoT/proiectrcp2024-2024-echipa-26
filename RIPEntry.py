@@ -17,6 +17,9 @@ class RIPEntry:
         self.nextHop = nextHop
         self.metric = metric
         self.routeTag = routeTag
+    
+    def __reduce__(self):
+        return (RIPEntry, (self.AF_id, self.ip, self.subnet, self.nextHop, self.metric, self.routeTag))
 
     def __eq__(self, other):
         return (self.AF_id == other.AF_id and 
