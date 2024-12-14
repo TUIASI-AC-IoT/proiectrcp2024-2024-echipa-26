@@ -61,6 +61,7 @@ def multicastListen(pipe,ipList,table, interfaces,myManager):
                 if len(entriesMsg) == 0:
                     continue
                 if len(entriesMsg) == 1 and entriesMsg[0].AF_id == 0 and entriesMsg[0].metric == INF:
+                    print('TRIMIT TOT')
                     pipe.send([Signals.SEND_ENTIRE_TABLE, s, msg.version])
                 for entry in entriesMsg:
                     # ???
@@ -69,6 +70,7 @@ def multicastListen(pipe,ipList,table, interfaces,myManager):
                     
             
             if command == Commands.RESPONSE:
+                print('AM PRIMIT UN RESPONSE')
                 if senderPort != multicastPort:
                     continue
                 for entry in entriesMsg:
@@ -82,6 +84,7 @@ def multicastListen(pipe,ipList,table, interfaces,myManager):
                     
                     entry.metric = min(entry.metric+1, INF)
                     if entry.ip not in entries and entry.metric != INF:
+                        print('ENTRY NOUUU')
                         entry.nextHop = senderIP
                         entries[entry.ip]= myManager.RIPEntry().generateFrom(entry)
                         timeout[entry.ip] = myManager.Timer(120)
@@ -94,6 +97,7 @@ def multicastListen(pipe,ipList,table, interfaces,myManager):
                         
                         
                         if entry.metric != entries[entry.ip].getMetric():
+                            print('ENTRY VECHI')
                             entries[entry.ip].setMetric(entry.metric)
                             entries[entry.ip].setMetric(senderIP)
                             flags[entry.ip] = Flags.CHANGED
@@ -176,6 +180,7 @@ def multicastSender(pipe,ipList,table, interfaces,myManager):
                 ent =[]
                 for key in entries.keys():
                     ent.append(entries[key])
+                print(f'TRIMIT TOT {len(ent)} ent la {address[0]}')
                 m = Message(Commands.RESPONSE, Versions.V2, ent)
                 b = messageToBytes(m)
                 socketList[0].sendto(b,address)
