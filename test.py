@@ -1,60 +1,43 @@
-import socket
-import struct
-import select
+import multiprocessing
+import multiprocessing.managers
+from RIPEntry import *
 
-multicastPort = 520
-multicastIP = '224.0.0.9'
+from time import sleep
+from Timer import *
 
-listenIP=['192.168.1.1', '192.168.2.1']
-sendIP = ['192.168.1.2', '192.168.3.2']
-
-def listen():
-    
-    socketList =[]
-
-    #sockets pt raspunsuri trimise direct
-    for ip in listenIP:
-        sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
-        sender.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sender.bind((ip, multicastPort))
-        socketList.append(sender)
-    
-    receiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
-    receiver.bind((multicastIP, multicastPort))
-
-    for ip in listenIP:
-        r = struct.pack("=4s4s", socket.inet_aton(multicastIP), socket.inet_aton(ip))
-        receiver.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, r)
-
-    socketList.append(receiver)
-        
-        
+def write(table):
+    entries, timeout = table
+    i = 0
     while True:
-        ready_to_read, _,_ = select.select(socketList,[],[], 0.1)
-        for receiver in ready_to_read:
-            data, s = receiver.recvfrom(1024)
-            print(data.decode('ascii')+' '+str(s) + ' '+str(receiver.getsockname()))
-            
-            
-            
+        entries['key'+str(i)] = RIPEntry(ip=f'{i}.{i}.{i}.{i}')
+        timeout['key'+str(i)] = Timer(30)
+        timeout['key'+str(i)].activate()
+        sleep(1)
+        i = i+1
+        i=i%256
 
-def send():
+def show(table):
+    entries, timeout = table
+    while True:
+        for i in entries:
+            print(f'Key: i\nVal: {entries[i]}')
+        sleep(3)
 
-    socketDict = []
-    multicast = (multicastIP, multicastPort)
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind(('', multicastPort))
-    s.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
-    s.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
-    for ip in sendIP:
-        s.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip))
-        
-        
+
+def main():
+    m = multiprocessing.Manager()
     
-    s.sendto(bytes('hey', 'ascii'), (listenIP[0], multicastPort))
-    s.sendto(bytes('multicast', 'ascii'), (multicastIP, multicastPort))
-        
-
-if __name__=="__main__":
-    pass
+    entries = m.dict()
+    timeout = m.dict()
+    table = (entries, timeout)
+    w = multiprocessing.Process(target=write, args =(table,))
+    s = multiprocessing.Process(target=show, args=(table,))
+    
+    w.start()
+    s.start()
+    
+    
+    w.join()
+    s.join()
+    
+    m.shutdown()
