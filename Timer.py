@@ -27,7 +27,7 @@ class Timer:
     def tick(self):
         if self.timer == -1:
             return False
-        if time()-self.timer()>self.timeout:
+        if time()-self.timer>self.timeout:
             return True
         return False
     

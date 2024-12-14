@@ -70,15 +70,15 @@ class RIPEntry:
     def __str__(self):
         return f'To: {self.ip} {self.subnet}: {self.nextHop}, cost: {self.metric}'
 
-def RIPtoBytes(RIPent):
+def RIPtoBytes(RIPent:RIPEntry):
     arr =[]
-    arr.append(struct.pack('!2H', RIPent.AF_id, RIPent.routeTag))
+    arr.append(struct.pack('!2H', RIPent.getAF_id(), RIPent.getRT()))
 
-    arr.append(socket.inet_aton(RIPent.ip))
-    arr.append(socket.inet_aton(RIPent.subnet))
-    arr.append(socket.inet_aton(RIPent.nextHop))
+    arr.append(socket.inet_aton(RIPent.getIP()))
+    arr.append(socket.inet_aton(RIPent.getSubnet()))
+    arr.append(socket.inet_aton(RIPent.getNextHop()))
 
-    arr.append(struct.pack('!I', RIPent.metric))
+    arr.append(struct.pack('!I', RIPent.getMetric()))
     return b''.join(arr)
     
 def bytesToRIP(bytes : bytes):
