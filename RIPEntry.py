@@ -25,7 +25,8 @@ class RIPEntry:
         self.nextHop = entry.nextHop
         self.metric = entry.metric
         self.routeTag = entry.routeTag
-
+    def clone(self):
+        return RIPEntry(self.getAF_id(), self.getIP(), self.getSubnet(), self.getNextHop(), self.getMetric(), self.getRT())
     def getAF_id(self):
         return self.AF_id
     def setAF_id(self, id):
