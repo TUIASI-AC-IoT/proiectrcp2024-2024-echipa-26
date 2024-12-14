@@ -186,7 +186,7 @@ def multicastSender(pipe,ipList,table, interfaces,myManager):
                 myIP = s.getsockname()[0]
                 splitHorizon = []
                 for key in entries.keys():
-                    if interfaces[entries[key].getNextHop()]!=myIP:
+                    if entries[key].getNextHop() in interfaces.keys() and interfaces[entries[key].getNextHop()]!=myIP:
                         splitHorizon.append(entries[key])
                 m = Message(command=Commands.RESPONSE, version=Versions.V2,RIPentries=splitHorizon)
                 b = messageToBytes(m)

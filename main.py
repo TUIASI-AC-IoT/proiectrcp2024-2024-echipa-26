@@ -93,7 +93,7 @@ def main():
     while True:
         if time()-t>60:
             for key in entries.keys():
-                print(entries[key])
+                print(entries[key].getIP())
             t= time()
 
 
