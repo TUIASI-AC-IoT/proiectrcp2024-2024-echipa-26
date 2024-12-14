@@ -12,10 +12,13 @@ class Timer:
         self.timeout = timeout
         self.timer = -1
     
-    def __reduce__(self):
-        return (Timer, (self.timeout, self.timer))
+
+        
+    def getTimer(self):
+        return self.timer
+    
     def activate(self):
-        if self.timer!=-1:
+        if self.timer == -1:
             self.timer = time()
         
     def deactivate(self):

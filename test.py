@@ -1,37 +1,57 @@
 import multiprocessing
 import multiprocessing.managers
+
 from RIPEntry import *
 
 from time import sleep
 from Timer import *
 
-def write(table):
-    entries, timeout = table
-    i = 0
-    while True:
-        entries['key'+str(i)] = RIPEntry(ip=f'{i}.{i}.{i}.{i}')
-        timeout['key'+str(i)] = Timer(30)
-        timeout['key'+str(i)].activate()
-        sleep(1)
-        i = i+1
-        i=i%256
 
-def show(table):
-    entries, timeout = table
-    while True:
-        for i in entries:
-            print(f'Key: i\nVal: {entries[i]}')
-        sleep(3)
 
+
+class MyManager(multiprocessing.managers.BaseManager):
+    pass
+
+MyManager.register('RIPEntry', RIPEntry)
+MyManager.register('Timer', Timer)
+
+
+
+def write(q, m):
+    entries, timeout = q
+    
+    entries['lol'] = m.RIPEntry(ip='lol')
+    timeout['lol'] = m.Timer(30)
+    sleep(5)
+    p = entries['lol']
+    print(p.getIP())
+    print(timeout['lol'].getTimer())
+    
+    
+
+def show(q, m):
+    entries, timeout = q
+    
+    sleep(2)
+    entries['lol'].setIP('atre')
+    timeout['lol'].activate()
+
+        
 
 def main():
-    m = multiprocessing.Manager()
     
-    entries = m.dict()
-    timeout = m.dict()
+    
+    m = MyManager()
+    p = multiprocessing.Manager()
+    m.start()
+    
+    entries = p.dict()
+    timeout = p.dict()
+    entries['lol'] = 'mata'
     table = (entries, timeout)
-    w = multiprocessing.Process(target=write, args =(table,))
-    s = multiprocessing.Process(target=show, args=(table,))
+    
+    w = multiprocessing.Process(target=write, args =(table,m,))
+    s = multiprocessing.Process(target=show, args=(table,m,))
     
     w.start()
     s.start()
@@ -41,3 +61,9 @@ def main():
     s.join()
     
     m.shutdown()
+    p.shutdown()
+    
+    
+
+if __name__ =="__main__":
+    main()
