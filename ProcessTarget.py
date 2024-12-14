@@ -190,7 +190,7 @@ def multicastSender(pipe,ipList,table, interfaces,myManager):
                         splitHorizon.append(entries[key])
                 m = Message(command=Commands.RESPONSE, version=Versions.V2,RIPentries=splitHorizon)
                 b = messageToBytes(m)
-                s.sendall(b, multicast)
+                s.sendto(b, multicast)
             timer.reset()
             
             
