@@ -51,6 +51,7 @@ def multicastListen(pipe,ipList,table, interfaces,myManager):
             senderPort = s[1]
             entriesMsg = msg.entries
             command = msg.command
+            print(f'Am primit {len(entriesMsg)} entries de la {senderIP}')
             
             myIP = receiver.getsockname()[0]
             if myIP != multicastIP:
