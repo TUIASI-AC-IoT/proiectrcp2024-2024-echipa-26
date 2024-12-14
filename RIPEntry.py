@@ -18,7 +18,14 @@ class RIPEntry:
         self.metric = metric
         self.routeTag = routeTag
     
-    
+    def generateFrom(self, entry):
+        self.AF_id = entry.AF_id
+        self.ip = entry.ip
+        self.subnet = entry.subnet
+        self.nextHop = entry.nextHop
+        self.metric = entry.metric
+        self.routeTag = entry.routeTag
+
     def getAF_id(self):
         return self.AF_id
     def setAF_id(self, id):

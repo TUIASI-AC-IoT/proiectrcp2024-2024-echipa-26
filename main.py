@@ -3,7 +3,17 @@ from random import seed, randint
 from os import environ, listdir, chdir, getpid, system
 from ProcessTarget import *
 from Message import *
-from multiprocessing import Process, Pipe
+import multiprocessing
+
+
+
+class MyManager(multiprocessing.managers.BaseManager):
+    pass
+
+MyManager.register('RIPEntry', RIPEntry)
+MyManager.register('Timer', Timer)
+
+
 def main():
 
     ipList = [] # lista de tuple
@@ -22,12 +32,50 @@ def main():
     seed(time())
     sleep(randint(1,10))
 
-    sender, listener = Pipe(False)
-    listenerProcess = Process(target = multicastListen, args=(listener,ipList,))
-    senderProcess = Process(target = multicastSender, args=(sender,ipList,))
+    manager = multiprocessing.Manager()
+    myManager = MyManager()
+    myManager.start()
+    
+    
+    interfaces = manager.dict()
+    timeout = manager.dict()
+    garbage = manager.dict()
+    flags = manager.dict()
+    entries = manager.dict()
+    
+    table = (entries, timeout, garbage, flags)
+    
+    for ip in ipList:
+        ent = myManager.RIPEntry()
+        ent.setIP(ip[0])
+        ent.setSubnet(ip[1])
+        ent.setNextHop(ip[0])
+        ent.setMetric(0)
+        entries[ip[0]] = ent
+    # entries       =   map<ip_dest     ,   RIPEntry>
+    # timeout       =   map<ip_dest     ,   Timer>
+    # garbage       =   map<ip_dest     ,   Timer>
+    # flags         =   map<ip_dest     ,   flags>
+    # interfaces va fi folosit pentru split horizon
+    # interfaces    =   map<ip_vecin    ,   my_ip>
+    
+
+    sender, listener = multiprocessing.Pipe(False)
+    
+    
+    listenerProcess = multiprocessing.Process(target = multicastListen, args=(listener,ipList,table, interfaces,myManager))
+    senderProcess = multiprocessing.Process(target = multicastSender, args=(sender,ipList,table,interfaces, myManager))
 
     listenerProcess.start()
     senderProcess.start()
+
+
+
+
+
+
+
+
 
     chdir('/home/tc')
     
@@ -40,11 +88,19 @@ def main():
 
     system("echo \"run source ~/.ashrc\n\"")
 
-    
+    t = time()
+    while True:
+        if time()-t>60:
+            for key in entries.keys():
+                print(entries[key])
+            t= time()
 
 
     listenerProcess.join()
     senderProcess.join()
+    
+    manager.shutdown()
+    myManager.shutdown()
 
     
 
