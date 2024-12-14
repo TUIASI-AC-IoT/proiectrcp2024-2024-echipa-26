@@ -159,7 +159,8 @@ def multicastSender(pipe,ipList,table, interfaces,myManager):
         sender.sendto(req, multicast)
         socketList.append(sender)
 
-    
+    generalUse = sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
+    generalUse.bind(('', 520))
 
 
 
@@ -183,7 +184,7 @@ def multicastSender(pipe,ipList,table, interfaces,myManager):
                 print(f'TRIMIT TOT {len(ent)} ent la {address[0]}')
                 m = Message(Commands.RESPONSE, Versions.V2, ent)
                 b = messageToBytes(m)
-                socketList[0].sendto(b,address)
+                generalUse.sendto(b,address)
         
         if timer.tick():
             triggeredUpdate = None
