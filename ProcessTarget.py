@@ -52,7 +52,7 @@ def multicastListen(pipe,ipList,table, interfaces,myManager):
             entriesMsg = msg.entries
             command = msg.command
             print(f'Am primit {len(entriesMsg)} entries de la {senderIP}')
-            if entries[0].ip == '0.0.0.0':
+            if entriesMsg[0].ip == '0.0.0.0':
                 pipe.send([Signals.SEND_ENTIRE_TABLE])
                 continue
             for ent in entriesMsg:
