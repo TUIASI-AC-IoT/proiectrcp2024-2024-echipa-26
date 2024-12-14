@@ -4,10 +4,11 @@ from os import environ, listdir, chdir, getpid, system
 from ProcessTarget import *
 from Message import *
 import multiprocessing
+from multiprocessing.managers import BaseManager
 
 
 
-class MyManager(multiprocessing.managers.BaseManager):
+class MyManager(BaseManager):
     pass
 
 MyManager.register('RIPEntry', RIPEntry)
