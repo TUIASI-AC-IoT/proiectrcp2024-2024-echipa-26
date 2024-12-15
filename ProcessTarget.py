@@ -113,7 +113,9 @@ def multicastSender(pipe,ipList):
     flags = dict()
     interfaces = dict()
     
-    
+    for ip in ipList:
+        e = RIPEntry(ip=ip[0], subnet=ip[1], nextHop=ip[0])
+        entries[ip[0]] = e
         
     # entries       =   map<ip_dest     ,   RIPEntry>
     # timeout       =   map<ip_dest     ,   Timer>
