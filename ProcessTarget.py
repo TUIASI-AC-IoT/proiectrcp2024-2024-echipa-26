@@ -52,11 +52,12 @@ def multicastListen(pipe,ipList,queue):
         for receiver in ready_to_read:
             data, s = receiver.recvfrom(1024)
             msg = bytesToMessage(data)
-            senderIP = s[0]
-            senderPort = s[1]
-            entriesMsg = msg.entries
-            command = msg.command
-            print(f'Am primit {len(entriesMsg)} entries de la {senderIP}')
+            pipe.send(msg, s, receiver.getsockname())
+            
+            continue
+            
+            
+            
             if entriesMsg[0].ip == '0.0.0.0':
                 pipe.send([Signals.SEND_ENTIRE_TABLE, s])
             else:
@@ -67,59 +68,15 @@ def multicastListen(pipe,ipList,queue):
                 table=(entries, timeout, garbage, flags)
                 putValues(queue, (table, interfaces))
             print('AM PROCESAT CE AM PRIMIT')
-            # myIP = receiver.getsockname()[0]
-            # if myIP != multicastIP:
-            #     interfaces[senderIP] = myIP
+            myIP = receiver.getsockname()[0]
+            if myIP != multicastIP:
+                interfaces[senderIP] = myIP
             
-            # if command == Commands.REQUEST:
-            #     if len(entriesMsg) == 0:
-            #         continue
-            #     if len(entriesMsg) == 1 and entriesMsg[0].AF_id == 0 and entriesMsg[0].metric == INF:
-            #         print('TRIMIT TOT')
-            #         pipe.send([Signals.SEND_ENTIRE_TABLE, s, msg.version])
-            #     for entry in entriesMsg:
-            #         # ???
-            #         break
+            
                         
                     
             
-            # if command == Commands.RESPONSE:
-            #     print('AM PRIMIT UN RESPONSE')
-            #     if senderPort != multicastPort:
-            #         continue
-            #     for entry in entriesMsg:
-            #         if entry.metric > INF:
-            #             # log
-            #             continue
-                    
-            #         if entry.ip == '0.0.0.0' or entry.ip == '127.0.0.1':
-            #             # log
-            #             continue
-                    
-            #         entry.metric = min(entry.metric+1, INF)
-            #         if entry.ip not in entries and entry.metric != INF:
-            #             print('ENTRY NOUUU')
-            #             entry.nextHop = senderIP
-            #             entries[entry.ip]= myManager.RIPEntry().generateFrom(entry)
-            #             timeout[entry.ip] = myManager.Timer(120)
-            #             timeout[entry.ip].activate()
-            #             garbage[entry.ip] = myManager.Timer(180)
-            #             flags[entry.ip] = Flags.CHANGED
-            #             pipe.send([Signals.TRIGERRED_UPDATE])
-                        
-            #         else:
-                        
-                        
-            #             if entry.metric != entries[entry.ip].getMetric():
-            #                 print('ENTRY VECHI')
-            #                 entries[entry.ip].setMetric(entry.metric)
-            #                 entries[entry.ip].setMetric(senderIP)
-            #                 flags[entry.ip] = Flags.CHANGED
-            #                 pipe.send([Signals.TRIGERRED_UPDATE])
-            #                 if entry.metric == INF:
-            #                     garbage[entry.ip].activate()
-            #                 else:
-            #                     timeout[entry.ip].reset()
+            
                             
                     
                         
@@ -156,6 +113,23 @@ def multicastSender(pipe,ipList,queue):
     sleep(randint(1,10))
         
 
+    entries = dict()
+    timeout = dict()
+    garbage = dict()
+    flags = dict()
+    interfaces = dict()
+    
+    
+        
+    # entries       =   map<ip_dest     ,   RIPEntry>
+    # timeout       =   map<ip_dest     ,   Timer>
+    # garbage       =   map<ip_dest     ,   Timer>
+    # flags         =   map<ip_dest     ,   flags>
+    # interfaces va fi folosit pentru split horizon
+    # interfaces    =   map<ip_vecin    ,   my_ip>
+    
+    timer =Timer(30)
+    timer.activate()
 
     socketList = []
     multicast = (multicastIP, multicastPort)
@@ -183,59 +157,103 @@ def multicastSender(pipe,ipList,queue):
     triggeredUpdate = None
     while True:
         if pipe.poll(0.1):
-            message = pipe.recv()
+            message, sender, sock = pipe.recv()
             
-            sig = message[0]
-            # if sig == Signals.TRIGERRED_UPDATE:
-            #     if triggeredUpdate is None:
-            #         triggeredUpdate = Timer(randint(1,5))
-            #         triggeredUpdate.activate()
-            if sig == Signals.SEND_ENTIRE_TABLE:
-                address = message[1]
-                ent =[]
-                table, interfaces = getValues(queue)
-                entries, timeout, garbage, flags = table
-                for key in entries.keys():
-                    ent.append(entries[key].clone())
-                table = (entries, timeout, garbage, flags)
-                putValues(queue, (table, interfaces))
-                m = Message(Commands.RESPONSE, Versions.V2, ent)
-                for i in ent:
-                    print(i.ip)
-                b = messageToBytes(m)
-                socketList[0].sendto(b,address)
-                print(f'TRIMIS TOT {len(ent)} ent la {address[0]} cu socket: {str(socketList[0].getsockname())}')
+            sockIP = sock[0]
+            if sockIP!=multicast:
+                interfaces[sender[0]] = sockIP
+            
+            
+            command = message.command
+            entriesMsg = message.entries
+            if command == Commands.REQUEST:
+                if len(entriesMsg) == 0:
+                    continue
+                if len(entriesMsg) == 1 and entriesMsg[0].AF_id == 0 and entriesMsg[0].metric == INF:
+                    m = Message(Commands.RESPONSE, Versions.V2, list(entries.values()))
+                    b = messageToBytes(m)
+                    socketList[0].send(b,sender)
+                    continue
+                for entry in entriesMsg:
+                    # ???
+                    break
+            
+            senderPort= sender[1]
+            senderIP=sender[0]
+            if command == Commands.RESPONSE:
+                
+                if senderPort != multicastPort:
+                    continue
+                for entry in entriesMsg:
+                    if entry.metric > INF:
+                        # log
+                        continue
+                    
+                    if entry.ip == '0.0.0.0' or entry.ip == '127.0.0.1':
+                        # log
+                        continue
+                    
+                    entry.metric = min(entry.metric+1, INF)
+                    if entry.ip not in entries and entry.metric != INF:
+                        entry.nextHop = senderIP
+                        entries[entry.ip]= RIPEntry().generateFrom(entry)
+                        timeout[entry.ip] = Timer(120)
+                        timeout[entry.ip].activate()
+                        garbage[entry.ip] = Timer(180)
+                        flags[entry.ip] = Flags.CHANGED
+                        if triggeredUpdate is None:
+                            triggeredUpdate = Timer(randint(1,5))
+                            triggeredUpdate.activate()
+                        
+                    else:
+                        
+                        
+                        if entry.metric != entries[entry.ip].getMetric():
+                            
+                            entries[entry.ip].setMetric(entry.metric)
+                            entries[entry.ip].setMetric(senderIP)
+                            flags[entry.ip] = Flags.CHANGED
+                            if triggeredUpdate is None:
+                                triggeredUpdate = Timer(randint(1,5))
+                                triggeredUpdate.activate()
+                            if entry.metric == INF:
+                                garbage[entry.ip].activate()
+                            else:
+                                timeout[entry.ip].reset()
+            
+            
         
-        # if timer.tick():
-        #     triggeredUpdate = None
-        #     #generate message and send it multicast
-        #     for s in socketList:
-        #         myIP = s.getsockname()[0]
-        #         splitHorizon = []
-        #         for key in entries.keys():
-        #             if entries[key].getNextHop() in interfaces.keys() and interfaces[entries[key].getNextHop()]!=myIP:
-        #                 splitHorizon.append(entries[key])
-        #         m = Message(command=Commands.RESPONSE, version=Versions.V2,RIPentries=splitHorizon)
-        #         b = messageToBytes(m)
-        #         s.sendto(b, multicast)
-        #     timer.reset()
+        if timer.tick():
+            triggeredUpdate = None
+            #generate message and send it multicast
+            for s in socketList:
+                myIP = s.getsockname()[0]
+                splitHorizon = []
+                for key in entries.keys():
+                    if entries[key].getNextHop() in interfaces.keys() and interfaces[entries[key].getNextHop()]!=myIP:
+                        splitHorizon.append(entries[key])
+                m = Message(command=Commands.RESPONSE, version=Versions.V2,RIPentries=splitHorizon)
+                b = messageToBytes(m)
+                s.sendto(b, multicast)
+            timer.reset()
             
             
             
-        # if triggeredUpdate is not None:
-        #     if triggeredUpdate.tick():
-        #         triggeredUpdate = None
-        #     toBeSent = []
-        #     for dest in entries.keys():
-        #         if flags[dest] == Flags.CHANGED:
-        #             toBeSent.append(entries[dest])
+        if triggeredUpdate is not None:
+            if triggeredUpdate.tick():
+                triggeredUpdate = None
+            toBeSent = []
+            for dest in entries.keys():
+                if flags[dest] == Flags.CHANGED:
+                    toBeSent.append(entries[dest])
+                    flags[dest]=Flags.UNCHANGED
             
-        #     for s in socketList:
-        #         splitHorizon = []
-        #         myIP = s.getsockname()[0]
-        #         for key in entries.keys():
-        #             if interfaces[entries[key].getNextHop()] != myIP:
-        #                 splitHorizon.append(entries[key])
-        #         m = Message(Commands.RESPONSE, Versions.V2, splitHorizon)
-        #         b = messageToBytes(m)
-        #         s.sendall(b, multicast) 
+            for s in socketList:
+                splitHorizon = []
+                myIP = s.getsockname()[0]
+                for key in entries.keys():
+                    if entries[key].getNextHop() in interfaces and interfaces[entries[key].getNextHop()] != myIP:
+                        splitHorizon.append(entries[key])
+                m = Message(Commands.RESPONSE, Versions.V2, splitHorizon)
+                b = messageToBytes(m)
+                s.sendato(b, multicast) 

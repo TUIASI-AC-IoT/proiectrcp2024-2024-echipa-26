@@ -37,36 +37,15 @@ def main():
     
     
     
-    interfaces =dict()
-    timeout = dict()
-    garbage = dict()
-    flags = dict()
-    entries = dict()
+
     
-    table = (entries, timeout, garbage, flags)
     
-    for ip in ipList:
-        ent = RIPEntry()
-        ent.setIP(ip[0])
-        ent.setSubnet(ip[1])
-        ent.setNextHop(ip[0])
-        ent.setMetric(0)
-        entries[ip[0]] = ent
-    # entries       =   map<ip_dest     ,   RIPEntry>
-    # timeout       =   map<ip_dest     ,   Timer>
-    # garbage       =   map<ip_dest     ,   Timer>
-    # flags         =   map<ip_dest     ,   flags>
-    # interfaces va fi folosit pentru split horizon
-    # interfaces    =   map<ip_vecin    ,   my_ip>
-    
-    queue = multiprocessing.Queue(256)
-    queue.put_nowait((table, interfaces))
     
     sender, listener = multiprocessing.Pipe(False)
     
     
-    listenerProcess = multiprocessing.Process(target = multicastListen, args=(listener,ipList,queue))
-    senderProcess = multiprocessing.Process(target = multicastSender, args=(sender,ipList,queue))
+    listenerProcess = multiprocessing.Process(target = multicastListen, args=(listener,ipList))
+    senderProcess = multiprocessing.Process(target = multicastSender, args=(sender,ipList))
 
     listenerProcess.start()
     senderProcess.start()
@@ -90,16 +69,7 @@ def main():
 
     system("echo \"run source ~/.ashrc\n\"")
 
-    t = time()
-    while True:
-        if time()-t>60:
-            table, interfaces = getValues(queue)
-            entries, timeout, garbage, flags = table
-            for key in entries.keys():
-                print(entries[key].getIP())
-            table = (entries, timeout, garbage, flags)
-            putValues(queue, (table, interfaces))
-            t= time()
+    
 
 
     listenerProcess.join()
