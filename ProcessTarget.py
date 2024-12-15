@@ -176,7 +176,6 @@ def multicastSender(pipe,ipList):
                 if len(entriesMsg) == 0:
                     continue
                 if len(entriesMsg) == 1 and entriesMsg[0].AF_id == 0 and entriesMsg[0].metric == INF:
-                    print(f'RSP LA REQUEST PT TOATA TABELA {len(list(entries.values()))}')
                     m = Message(Commands.RESPONSE, Versions.V2, list(entries.values()))
                     
                     b = messageToBytes(m)
@@ -189,6 +188,7 @@ def multicastSender(pipe,ipList):
             senderPort= sender[1]
             senderIP=sender[0]
             if command == Commands.RESPONSE:
+                print(f'am primit {len(entriesMsg)} entries')
                 if senderPort != multicastPort:
                     continue
                 for entry in entriesMsg:
@@ -199,6 +199,7 @@ def multicastSender(pipe,ipList):
                     if entry.ip == '0.0.0.0' or entry.ip == '127.0.0.1':
                         # log
                         continue
+                    
                     
                     if entry.ip in ipList:
                         print('OPS IGNORED')
@@ -260,7 +261,6 @@ def multicastSender(pipe,ipList):
                 
                 for s in socketList:
                     splitHorizon = []
-                    myIP = s.getsockname()[0]
                     for key in entries.keys():    
                         splitHorizon.append(entries[key])
                     m = Message(Commands.RESPONSE, Versions.V2, splitHorizon)
