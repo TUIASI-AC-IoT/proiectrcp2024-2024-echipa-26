@@ -16,14 +16,8 @@ multicastIP = '224.0.0.9'
 class Signals:
     SEND_ENTIRE_TABLE = 0
     TRIGERRED_UPDATE = 1
-    
-def getValues(queue):
-    return queue.get()
-
-def putValues(queue, vals):
-    queue.put_nowait(vals)
-
-def multicastListen(pipe,ipList,queue):
+ 
+def multicastListen(pipe,ipList):
     
     socketList =[]
 
@@ -99,7 +93,7 @@ class Flags:
 
 
 
-def multicastSender(pipe,ipList,queue):
+def multicastSender(pipe,ipList):
     
     
    #if sigint close all sockets
