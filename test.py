@@ -50,9 +50,11 @@ def send(ipList):
         nullEntry = RIPEntry(0,'0.0.0.0','0.0.0.0','0.0.0.0',16,0)
         req = bytes('multicast', 'ascii')
         sender.sendto(req, multicast)
+        print(f'am trimis multicast pe {sender.getsockname()}')
         socketList.append(sender)
     
     socketList[0].sendto(bytes('normal', 'ascii'), ('192.168.1.1', 520))
+    print('Am trimis normal')
     
     
     for i in socketList:
