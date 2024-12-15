@@ -69,7 +69,7 @@ class RIPEntry:
         return hash((self.AF_id, self.ip, self.subnet, self.nextHop, self.metric,self.routeTag))
 
     def __str__(self):
-        return f'To: {self.ip} {self.subnet}: {self.nextHop}, cost: {self.metric}'
+        return f'AF_id: {self.AF_id}\n'+f'IP: {self.ip}\n'+f'Subnet: {self.subnet}\n'+f'NextHop: {self.nextHop}\n'+f'Metric: {self.metric}\n'+f'Route Tag: {self.routeTag}'
 
 def RIPtoBytes(RIPent:RIPEntry):
     arr =[]

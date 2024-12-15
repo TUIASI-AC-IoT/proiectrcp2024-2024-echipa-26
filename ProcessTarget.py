@@ -111,7 +111,15 @@ def multicastSender(pipe,ipList):
     timeout = dict()
     garbage = dict()
     flags = dict()
-    interfaces = dict()
+    #interfaces = dict()
+    
+    def usr1(a,b):
+        f = open('table.txt', 'w')
+        for i in entries:
+            f.write(str(entries[i]))
+            f.write("\n\n")
+        f.close()
+    signal.signal(signal.SIGUSR1, usr1)
     
     for ip in ipList:
         e = RIPEntry(ip=ip[0], subnet=ip[1], nextHop=ip[0])
@@ -156,8 +164,7 @@ def multicastSender(pipe,ipList):
             message, sender, sock = pipe.recv()
             
             sockIP = sock[0]
-            if sockIP!=multicast:
-                interfaces[sender[0]] = sockIP
+            
             
             
             command = message.command
@@ -178,7 +185,6 @@ def multicastSender(pipe,ipList):
             senderPort= sender[1]
             senderIP=sender[0]
             if command == Commands.RESPONSE:
-                print(f'RSP LA {len(entriesMsg)} entries response')
                 if senderPort != multicastPort:
                     continue
                 for entry in entriesMsg:
@@ -188,6 +194,9 @@ def multicastSender(pipe,ipList):
                     
                     if entry.ip == '0.0.0.0' or entry.ip == '127.0.0.1':
                         # log
+                        continue
+                    
+                    if entry.ip in ipList:
                         continue
                     
                     entry.metric = min(entry.metric+1, INF)
@@ -226,10 +235,8 @@ def multicastSender(pipe,ipList):
             for s in socketList:
                 myIP = s.getsockname()[0]
                 splitHorizon = []
-                for key in entries.keys():
-                    if entries[key].getNextHop() in interfaces.keys() and interfaces[entries[key].getNextHop()]!=myIP:
-                        splitHorizon.append(entries[key])
-                print(f'AM TRIMIS {len(splitHorizon)} multicast update')
+                for key in entries.keys():    
+                    splitHorizon.append(entries[key])
                 m = Message(command=Commands.RESPONSE, version=Versions.V2,RIPentries=splitHorizon)
                 b = messageToBytes(m)
                 s.sendto(b, multicast)
@@ -249,9 +256,8 @@ def multicastSender(pipe,ipList):
             for s in socketList:
                 splitHorizon = []
                 myIP = s.getsockname()[0]
-                for key in entries.keys():
-                    if entries[key].getNextHop() in interfaces and interfaces[entries[key].getNextHop()] != myIP:
-                        splitHorizon.append(entries[key])
+                for key in entries.keys():    
+                    splitHorizon.append(entries[key])
                 m = Message(Commands.RESPONSE, Versions.V2, splitHorizon)
                 b = messageToBytes(m)
                 s.sendto(b, multicast) 
