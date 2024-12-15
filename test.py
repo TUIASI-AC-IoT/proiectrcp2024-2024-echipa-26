@@ -1,8 +1,9 @@
 import multiprocessing
 import multiprocessing.managers
+import multiprocessing.process
 
 from RIPEntry import *
-
+from random import randint
 from time import sleep
 from Timer import *
 from os import environ, listdir
@@ -35,6 +36,7 @@ def listen(ipList):
             print(f'am primit {data.decode('ascii')} de la {str(s)} pe socket-ul {str(receiver.getsockname())}')
             
 def send(ipList):
+    sleep(randint(1,5))
     socketList = []
     multicast = (multicastIP, multicastPort)
 
@@ -66,10 +68,16 @@ def main():
         lines = file.readlines()
         ipList.append((lines[2][3:-1],lines[3][7:-1]))
         
-    if ID == 1:
-        listen()
-    if ID == 2:
-        send()
+    p1 = multiprocessing.Process(target=listen, args=(ipList,))
+    p2 = multiprocessing.Process(target=send, args=(ipList,))
+    
+    p1.start()
+    p2.start()
+    
+    p1.join()
+    p2.join()
+    
+    
 
 if __name__ =="__main__":
     main()
