@@ -33,7 +33,7 @@ def listen(ipList):
         ready_to_read, _,_ = select.select(socketList,[],[], 0.1)
         for receiver in ready_to_read:
             data, s = receiver.recvfrom(1024)
-            print(f'am primit {data.decode('ascii')} de la {str(s)} pe socket-ul {str(receiver.getsockname())}')
+            print(f'am primit {data.decode()} de la {str(s)} pe socket-ul {str(receiver.getsockname())}')
             
 def send(ipList):
     sleep(randint(1,5))
