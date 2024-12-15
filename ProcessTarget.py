@@ -124,6 +124,9 @@ def multicastSender(pipe,ipList):
     for ip in ipList:
         e = RIPEntry(ip=ip[0], subnet=ip[1], nextHop=ip[0])
         entries[ip[0]] = e
+        flags[ip[0]] = Flags.UNCHANGED
+        timeout[ip[0]] = Timer(120)
+        garbage[ip[0]] = Timer(180)
         
     # entries       =   map<ip_dest     ,   RIPEntry>
     # timeout       =   map<ip_dest     ,   Timer>
@@ -197,6 +200,7 @@ def multicastSender(pipe,ipList):
                         continue
                     
                     if entry.ip in ipList:
+                        print('OPS IGNORED')
                         continue
                     
                     entry.metric = min(entry.metric+1, INF)
