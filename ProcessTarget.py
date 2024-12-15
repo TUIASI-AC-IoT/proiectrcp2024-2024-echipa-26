@@ -205,7 +205,7 @@ def multicastSender(pipe,ipList):
                         print('OPS IGNORED')
                         continue
                     print('le bag in seama')
-                    entry.metric = min(entry.metric+1, INF)
+                    entry.metric = int(min(entry.metric+1, INF))
                     if entry.ip not in entries and entry.metric != INF:
                         entry.nextHop = senderIP
                         entries[entry.ip]= entry
@@ -223,7 +223,7 @@ def multicastSender(pipe,ipList):
                         if entry.metric != entries[entry.ip].getMetric():
                             
                             entries[entry.ip].setMetric(entry.metric)
-                            entries[entry.ip].setMetric(senderIP)
+                            entries[entry.ip].setNextHop(senderIP)
                             flags[entry.ip] = Flags.CHANGED
                             if triggeredUpdate is None:
                                 triggeredUpdate = Timer(randint(1,5))
