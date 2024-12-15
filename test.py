@@ -52,8 +52,12 @@ def send(ipList):
         sender.sendto(req, multicast)
         print(f'am trimis multicast pe {sender.getsockname()}')
         socketList.append(sender)
-    
-    socketList[0].sendto(bytes('normal', 'ascii'), ('192.168.1.1', 520))
+    if environ['ID']=='2':
+        ip ='192.168.1.1'
+    else:
+        ip ='192.168.1.2'
+
+    socketList[0].sendto(bytes('normal', 'ascii'), (ip, 520))
     print('Am trimis normal')
     
     
