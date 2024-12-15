@@ -188,6 +188,8 @@ def multicastSender(pipe,ipList,table, interfaces,myManager):
                     ent.append(entries[key].clone())
                 
                 m = Message(Commands.RESPONSE, Versions.V2, ent)
+                for i in ent:
+                    print(i.ip)
                 b = messageToBytes(m)
                 socketList[0].sendto(b,address)
                 print(f'TRIMIS TOT {len(ent)} ent la {address[0]}')
