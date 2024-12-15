@@ -60,7 +60,7 @@ def multicastListen(pipe,ipList,queue):
             if entriesMsg[0].ip == '0.0.0.0':
                 pipe.send([Signals.SEND_ENTIRE_TABLE, s])
             else:
-                table, interfaces = getValues()
+                table, interfaces = getValues(queue)
                 entries, timeout, garbage, flags = table
                 for ent in entriesMsg:
                     entries[ent.ip] = RIPEntry().generateFrom(ent)
@@ -193,7 +193,7 @@ def multicastSender(pipe,ipList,queue):
             if sig == Signals.SEND_ENTIRE_TABLE:
                 address = message[1]
                 ent =[]
-                table, interfaces = getValues()
+                table, interfaces = getValues(queue)
                 entries, timeout, garbage, flags = table
                 for key in entries.keys():
                     ent.append(entries[key].clone())
