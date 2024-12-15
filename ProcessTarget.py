@@ -57,6 +57,7 @@ def multicastListen(pipe,ipList,table, interfaces,myManager):
             else:
                 for ent in entriesMsg:
                     entries[ent.ip] = myManager.RIPEntry().generateFrom(ent)
+            print('AM PROCESAT CE AM PRIMIT')
             # myIP = receiver.getsockname()[0]
             # if myIP != multicastIP:
             #     interfaces[senderIP] = myIP
@@ -158,6 +159,7 @@ def multicastSender(pipe,ipList,table, interfaces,myManager):
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip[0]))
         nullEntry = RIPEntry(0,'0.0.0.0','0.0.0.0','0.0.0.0',16,0)
+        print('MULTICAST REQ PT TOATA TABELA')
         req = Message(Commands.REQUEST, Versions.V2, [nullEntry])
         req = messageToBytes(req)
         sender.sendto(req, multicast)
@@ -184,10 +186,11 @@ def multicastSender(pipe,ipList,table, interfaces,myManager):
                 ent =[]
                 for key in entries.keys():
                     ent.append(entries[key].clone())
-                print(f'TRIMIT TOT {len(ent)} ent la {address[0]}')
+                
                 m = Message(Commands.RESPONSE, Versions.V2, ent)
                 b = messageToBytes(m)
                 socketList[0].sendto(b,address)
+                print(f'TRIMIS TOT {len(ent)} ent la {address[0]}')
         
         # if timer.tick():
         #     triggeredUpdate = None
