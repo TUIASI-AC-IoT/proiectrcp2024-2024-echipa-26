@@ -9,12 +9,6 @@ from multiprocessing.managers import BaseManager
 
 
 
-class MyManager(BaseManager):
-    pass
-
-MyManager.register('RIPEntry', RIPEntry)
-MyManager.register('Timer', Timer)
-
 
 def main():
 
