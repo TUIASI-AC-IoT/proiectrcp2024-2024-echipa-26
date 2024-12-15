@@ -200,9 +200,12 @@ def multicastSender(pipe,ipList):
                         # log
                         continue
                     
-                    
-                    if entry.ip in ipList:
-                        print('OPS IGNORED')
+                    mine = False
+                    for ip in ipList:
+                        if ip == entry.ip:
+                            print('OPS ignored')
+                            mine = True
+                    if mine:
                         continue
                     print('le bag in seama')
                     entry.metric = int(min(entry.metric+1, INF))
