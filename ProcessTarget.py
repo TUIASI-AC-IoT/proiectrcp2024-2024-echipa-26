@@ -209,8 +209,9 @@ def multicastSender(pipe,ipList):
                     if mine:
                         continue
                     
-                    entry.metric = int(min(entry.metric+1, INF))
+                    
                     if entry.ip not in entries and entry.metric != INF:
+                        entry.metric = int(min(entry.metric+1, INF))
                         entry.nextHop = senderIP
                         entries[entry.ip]= entry
                         timeout[entry.ip] = Timer(120)
