@@ -201,13 +201,14 @@ def multicastSender(pipe,ipList):
                         continue
                     
                     mine = False
+                    print(entry.nextHop)
                     for ip in ipList:
                         if ip == entry.nextHop:
                             print('OPS ignored')
                             mine = True
                     if mine:
                         continue
-                    print('le bag in seama')
+                    
                     entry.metric = int(min(entry.metric+1, INF))
                     if entry.ip not in entries and entry.metric != INF:
                         entry.nextHop = senderIP
