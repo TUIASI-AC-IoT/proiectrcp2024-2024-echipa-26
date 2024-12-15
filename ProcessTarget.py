@@ -192,7 +192,7 @@ def multicastSender(pipe,ipList,table, interfaces,myManager):
                     print(i.ip)
                 b = messageToBytes(m)
                 socketList[0].sendto(b,address)
-                print(f'TRIMIS TOT {len(ent)} ent la {address[0]}')
+                print(f'TRIMIS TOT {len(ent)} ent la {address[0]} cu socket: {str(socketList[0].getsockname())}')
         
         # if timer.tick():
         #     triggeredUpdate = None
