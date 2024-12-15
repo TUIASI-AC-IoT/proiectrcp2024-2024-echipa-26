@@ -148,7 +148,7 @@ def multicastSender(pipe,ipList):
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip[0]))
-        nullEntry = RIPEntry(0,'0.0.0.0','0.0.0.0','0.0.0.0',16,0)
+        nullEntry = RIPEntry(0,'0.0.0.0','0.0.0.0','0.0.0.0',INF,0)
         print('MULTICAST REQ PT TOATA TABELA')
         req = Message(Commands.REQUEST, Versions.V2, [nullEntry])
         req = messageToBytes(req)
