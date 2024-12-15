@@ -166,7 +166,7 @@ def multicastSender(pipe,ipList):
         if pipe.poll(0.1):
             message, sender, sock = pipe.recv()
             
-            sockIP = sock[0]
+            
             
             
             
@@ -176,8 +176,9 @@ def multicastSender(pipe,ipList):
                 if len(entriesMsg) == 0:
                     continue
                 if len(entriesMsg) == 1 and entriesMsg[0].AF_id == 0 and entriesMsg[0].metric == INF:
-                    print('RSP LA REQUEST PT TOATA TABELA')
+                    print(f'RSP LA REQUEST PT TOATA TABELA {len(list(entries.values()))}')
                     m = Message(Commands.RESPONSE, Versions.V2, list(entries.values()))
+                    
                     b = messageToBytes(m)
                     socketList[0].sendto(b,sender)
                     continue
@@ -251,17 +252,17 @@ def multicastSender(pipe,ipList):
         if triggeredUpdate is not None:
             if triggeredUpdate.tick():
                 triggeredUpdate = None
-            toBeSent = []
-            for dest in entries.keys():
-                if flags[dest] == Flags.CHANGED:
-                    toBeSent.append(entries[dest])
-                    flags[dest]=Flags.UNCHANGED
-            
-            for s in socketList:
-                splitHorizon = []
-                myIP = s.getsockname()[0]
-                for key in entries.keys():    
-                    splitHorizon.append(entries[key])
-                m = Message(Commands.RESPONSE, Versions.V2, splitHorizon)
-                b = messageToBytes(m)
-                s.sendto(b, multicast) 
+                toBeSent = []
+                for dest in entries.keys():
+                    if flags[dest] == Flags.CHANGED:
+                        toBeSent.append(entries[dest])
+                        flags[dest]=Flags.UNCHANGED
+                
+                for s in socketList:
+                    splitHorizon = []
+                    myIP = s.getsockname()[0]
+                    for key in entries.keys():    
+                        splitHorizon.append(entries[key])
+                    m = Message(Commands.RESPONSE, Versions.V2, splitHorizon)
+                    b = messageToBytes(m)
+                    s.sendto(b, multicast) 
