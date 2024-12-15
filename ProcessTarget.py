@@ -164,9 +164,10 @@ def multicastSender(pipe,ipList):
                 if len(entriesMsg) == 0:
                     continue
                 if len(entriesMsg) == 1 and entriesMsg[0].AF_id == 0 and entriesMsg[0].metric == INF:
+                    print('RSP LA REQUEST PT TOATA TABELA')
                     m = Message(Commands.RESPONSE, Versions.V2, list(entries.values()))
                     b = messageToBytes(m)
-                    socketList[0].send(b,sender)
+                    socketList[0].sendto(b,sender)
                     continue
                 for entry in entriesMsg:
                     # ???
@@ -175,7 +176,7 @@ def multicastSender(pipe,ipList):
             senderPort= sender[1]
             senderIP=sender[0]
             if command == Commands.RESPONSE:
-                
+                print(f'RSP LA {len(entriesMsg)} entries response')
                 if senderPort != multicastPort:
                     continue
                 for entry in entriesMsg:
@@ -226,6 +227,7 @@ def multicastSender(pipe,ipList):
                 for key in entries.keys():
                     if entries[key].getNextHop() in interfaces.keys() and interfaces[entries[key].getNextHop()]!=myIP:
                         splitHorizon.append(entries[key])
+                print(f'AM TRIMIS {len(splitHorizon)} multicast update')
                 m = Message(command=Commands.RESPONSE, version=Versions.V2,RIPentries=splitHorizon)
                 b = messageToBytes(m)
                 s.sendto(b, multicast)
@@ -250,4 +252,4 @@ def multicastSender(pipe,ipList):
                         splitHorizon.append(entries[key])
                 m = Message(Commands.RESPONSE, Versions.V2, splitHorizon)
                 b = messageToBytes(m)
-                s.sendato(b, multicast) 
+                s.sendto(b, multicast) 
