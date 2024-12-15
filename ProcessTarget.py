@@ -46,7 +46,7 @@ def multicastListen(pipe,ipList):
         for receiver in ready_to_read:
             data, s = receiver.recvfrom(1024)
             msg = bytesToMessage(data)
-            pipe.send(msg, s, receiver.getsockname())
+            pipe.send((msg, s, receiver.getsockname()))
             
             continue
             
