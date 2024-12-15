@@ -204,11 +204,11 @@ def multicastSender(pipe,ipList):
                     if entry.ip in ipList:
                         print('OPS IGNORED')
                         continue
-                    
+                    print('le bag in seama')
                     entry.metric = min(entry.metric+1, INF)
                     if entry.ip not in entries and entry.metric != INF:
                         entry.nextHop = senderIP
-                        entries[entry.ip]= RIPEntry().generateFrom(entry)
+                        entries[entry.ip]= entry
                         timeout[entry.ip] = Timer(120)
                         timeout[entry.ip].activate()
                         garbage[entry.ip] = Timer(180)
