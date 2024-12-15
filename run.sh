@@ -7,4 +7,4 @@
 
 #are rol de debug/faciliteaza munca
 
-python3 main.py &
+python3 test.py &
