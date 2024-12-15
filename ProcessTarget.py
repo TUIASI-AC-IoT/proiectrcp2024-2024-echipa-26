@@ -17,12 +17,17 @@ class Signals:
     SEND_ENTIRE_TABLE = 0
     TRIGERRED_UPDATE = 1
     
+def getValues(queue):
+    return queue.get()
 
-def multicastListen(pipe,ipList,table, interfaces,myManager):
+def putValues(queue, vals):
+    queue.put_nowait(vals)
+
+def multicastListen(pipe,ipList,queue):
     
     socketList =[]
 
-    entries, timeout, garbage, flags = table
+    # entries, timeout, garbage, flags = table
     
     
     for ip in ipList:
@@ -55,8 +60,12 @@ def multicastListen(pipe,ipList,table, interfaces,myManager):
             if entriesMsg[0].ip == '0.0.0.0':
                 pipe.send([Signals.SEND_ENTIRE_TABLE, s])
             else:
+                table, interfaces = getValues()
+                entries, timeout, garbage, flags = table
                 for ent in entriesMsg:
-                    entries[ent.ip] = myManager.RIPEntry().generateFrom(ent)
+                    entries[ent.ip] = RIPEntry().generateFrom(ent)
+                table=(entries, timeout, garbage, flags)
+                putValues(queue, (table, interfaces))
             print('AM PROCESAT CE AM PRIMIT')
             # myIP = receiver.getsockname()[0]
             # if myIP != multicastIP:
@@ -133,13 +142,13 @@ class Flags:
 
 
 
-def multicastSender(pipe,ipList,table, interfaces,myManager):
+def multicastSender(pipe,ipList,queue):
     
     
    #if sigint close all sockets
     
     
-    entries, timeout, garbage, flags = table
+    #entries, timeout, garbage, flags = table
     timer = Timer(30)
     timer.activate()
     seed(time())
@@ -184,9 +193,12 @@ def multicastSender(pipe,ipList,table, interfaces,myManager):
             if sig == Signals.SEND_ENTIRE_TABLE:
                 address = message[1]
                 ent =[]
+                table, interfaces = getValues()
+                entries, timeout, garbage, flags = table
                 for key in entries.keys():
                     ent.append(entries[key].clone())
-                
+                table = (entries, timeout, garbage, flags)
+                putValues(queue, (table, interfaces))
                 m = Message(Commands.RESPONSE, Versions.V2, ent)
                 for i in ent:
                     print(i.ip)

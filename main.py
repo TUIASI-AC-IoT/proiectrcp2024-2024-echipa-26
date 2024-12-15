@@ -1,3 +1,4 @@
+import multiprocessing.queues
 from time import sleep, time
 from random import seed, randint
 from os import environ, listdir, chdir, getpid, system
@@ -33,21 +34,19 @@ def main():
     seed(time())
     sleep(randint(1,10))
 
-    manager = multiprocessing.Manager()
-    myManager = MyManager()
-    myManager.start()
     
     
-    interfaces = manager.dict()
-    timeout = manager.dict()
-    garbage = manager.dict()
-    flags = manager.dict()
-    entries = manager.dict()
+    
+    interfaces =dict()
+    timeout = dict()
+    garbage = dict()
+    flags = dict()
+    entries = dict()
     
     table = (entries, timeout, garbage, flags)
     
     for ip in ipList:
-        ent = myManager.RIPEntry()
+        ent = RIPEntry()
         ent.setIP(ip[0])
         ent.setSubnet(ip[1])
         ent.setNextHop(ip[0])
@@ -60,12 +59,14 @@ def main():
     # interfaces va fi folosit pentru split horizon
     # interfaces    =   map<ip_vecin    ,   my_ip>
     
-
+    queue = multiprocessing.Queue(256)
+    queue.put_nowait((table, interfaces))
+    
     sender, listener = multiprocessing.Pipe(False)
     
     
-    listenerProcess = multiprocessing.Process(target = multicastListen, args=(listener,ipList,table, interfaces,myManager))
-    senderProcess = multiprocessing.Process(target = multicastSender, args=(sender,ipList,table,interfaces, myManager))
+    listenerProcess = multiprocessing.Process(target = multicastListen, args=(listener,ipList,queue))
+    senderProcess = multiprocessing.Process(target = multicastSender, args=(sender,ipList,queue))
 
     listenerProcess.start()
     senderProcess.start()
@@ -92,16 +93,18 @@ def main():
     t = time()
     while True:
         if time()-t>60:
+            table, interfaces = getValues(queue)
+            entries, timeout, garbage, flags = table
             for key in entries.keys():
                 print(entries[key].getIP())
+            table = (entries, timeout, garbage, flags)
+            putValues(queue, (table, interfaces))
             t= time()
 
 
     listenerProcess.join()
     senderProcess.join()
     
-    manager.shutdown()
-    myManager.shutdown()
 
     
 
