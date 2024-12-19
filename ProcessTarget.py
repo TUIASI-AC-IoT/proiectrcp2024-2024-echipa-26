@@ -100,8 +100,7 @@ def multicastSender(pipe,ipList):
     
     
     #entries, timeout, garbage, flags = table
-    timer = Timer(30)
-    timer.activate()
+    
     seed(time())
     
     sleep(randint(1,10))
@@ -125,8 +124,8 @@ def multicastSender(pipe,ipList):
         e = RIPEntry(ip=ip[0], subnet=ip[1], nextHop=ip[0], metric=0)
         entries[ip[0]] = e
         flags[ip[0]] = Flags.UNCHANGED
-        timeout[ip[0]] = Timer(120)
-        garbage[ip[0]] = Timer(180)
+        timeout[ip[0]] = Timer(40)
+        garbage[ip[0]] = Timer(30)
         
     # entries       =   map<ip_dest     ,   RIPEntry>
     # timeout       =   map<ip_dest     ,   Timer>
@@ -201,7 +200,7 @@ def multicastSender(pipe,ipList):
                     mine = False
                     
                     for ip in ipList:
-                        
+                        # de adaugat si comparatia cu subnet
                         if ip[0] == entry.ip:
                             mine = True
                             break
@@ -214,9 +213,9 @@ def multicastSender(pipe,ipList):
                         print(f'entry nou cu metrica{entry.metric}')
                         entry.nextHop = senderIP
                         entries[entry.ip]= entry
-                        timeout[entry.ip] = Timer(120)
+                        timeout[entry.ip] = Timer(40)
                         timeout[entry.ip].activate()
-                        garbage[entry.ip] = Timer(180)
+                        garbage[entry.ip] = Timer(30)
                         flags[entry.ip] = Flags.CHANGED
                         if triggeredUpdate is None:
                             triggeredUpdate = Timer(randint(1,5))
@@ -249,8 +248,8 @@ def multicastSender(pipe,ipList):
                     triggeredUpdate = Timer(randint(1,5))
                     triggeredUpdate.activate()
                 
-        for key in entries.keys():
-            if garbage[key].tick():
+        for key in garbage.keys():
+            if key in garbage and garbage[key].tick():
                 del timeout[key]
                 del entries[key]
                 del flags[key]
