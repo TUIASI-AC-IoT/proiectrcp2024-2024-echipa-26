@@ -216,8 +216,8 @@ def multicastSender(pipe,ipList):
         e = RIPEntry(ip=ip[0], subnet=ip[1], nextHop=ip[0], metric=0)
         entries[ip[0]] = e
         flags[ip[0]] = Flags.UNCHANGED
-        timeout[ip[0]] = Timer(40)
-        garbage[ip[0]] = Timer(30)
+        timeout[ip[0]] = Timer(120)
+        garbage[ip[0]] = Timer(180)
         
     # entries       =   map<ip_dest     ,   RIPEntry>
     # timeout       =   map<ip_dest     ,   Timer>
@@ -309,9 +309,9 @@ def multicastSender(pipe,ipList):
                         print(f'entry nou cu metrica{entry.metric}')
                         entry.nextHop = senderIP
                         entries[entry.ip]= entry
-                        timeout[entry.ip] = Timer(40)
+                        timeout[entry.ip] = Timer(120)
                         timeout[entry.ip].activate()
-                        garbage[entry.ip] = Timer(30)
+                        garbage[entry.ip] = Timer(180)
                         flags[entry.ip] = Flags.CHANGED
                         if triggeredUpdate is None:
                             triggeredUpdate = Timer(randint(1,5))
@@ -320,7 +320,7 @@ def multicastSender(pipe,ipList):
                     else:
                         
                         print('entry vechi')
-                        if entry.metric != entries[entry.ip].getMetric():
+                        if entry.metric != entries[entry.ip].getMetric() and entries[entry.ip].nextHop != entry.nextHop:
                             print('se schimba entry vechi')
                             entries[entry.ip].setMetric(entry.metric)
                             entries[entry.ip].setNextHop(senderIP)
