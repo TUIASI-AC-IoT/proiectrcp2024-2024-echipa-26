@@ -122,7 +122,7 @@ def multicastSender(pipe,ipList):
     signal.signal(signal.SIGUSR1, usr1)
     
     for ip in ipList:
-        e = RIPEntry(ip=ip[0], subnet=ip[1], nextHop=ip[0])
+        e = RIPEntry(ip=ip[0], subnet=ip[1], nextHop=ip[0], metric=0)
         entries[ip[0]] = e
         flags[ip[0]] = Flags.UNCHANGED
         timeout[ip[0]] = Timer(120)
@@ -149,7 +149,6 @@ def multicastSender(pipe,ipList):
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
         sender.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(ip[0]))
         nullEntry = RIPEntry(0,'0.0.0.0','0.0.0.0','0.0.0.0',INF,0)
-        print('MULTICAST REQ PT TOATA TABELA')
         req = Message(Commands.REQUEST, Versions.V2, [nullEntry])
         req = messageToBytes(req)
         sender.sendto(req, multicast)
@@ -177,7 +176,6 @@ def multicastSender(pipe,ipList):
                     continue
                 if len(entriesMsg) == 1 and entriesMsg[0].AF_id == 0 and entriesMsg[0].metric == INF:
                     m = Message(Commands.RESPONSE, Versions.V2, list(entries.values()))
-                    
                     b = messageToBytes(m)
                     socketList[0].sendto(b,sender)
                     continue
@@ -201,7 +199,7 @@ def multicastSender(pipe,ipList):
                         continue
                     
                     mine = False
-                    print(entry.nextHop)
+                    
                     for ip in ipList:
                         if ip == entry.nextHop:
                             print('OPS ignored')
