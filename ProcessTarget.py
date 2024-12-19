@@ -201,8 +201,8 @@ def multicastSender(pipe,ipList):
                     mine = False
                     
                     for ip in ipList:
-                        print(ip+' '+entry.ip)
-                        if ip == entry.ip:
+                        
+                        if ip[0] == entry.ip:
                             print('OPS ignored')
                             mine = True
                             break
