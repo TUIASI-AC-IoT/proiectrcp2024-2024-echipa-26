@@ -249,7 +249,7 @@ def multicastSender(pipe,ipList):
                     triggeredUpdate = Timer(randint(1,5))
                     triggeredUpdate.activate()
                 
-        for key in garbage.keys():
+        for key in list(garbage.keys()):
             if garbage[key].tick():
                 del timeout[key]
                 del entries[key]
