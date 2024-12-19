@@ -320,7 +320,7 @@ def multicastSender(pipe,ipList):
                     else:
                         
                         print('entry vechi')
-                        if entry.metric != entries[entry.ip].getMetric() and entries[entry.ip].nextHop != entry.nextHop:
+                        if entry.metric != entries[entry.ip].getMetric() and entry.metric<entries[entry.ip].metric:
                             print('se schimba entry vechi')
                             entries[entry.ip].setMetric(entry.metric)
                             entries[entry.ip].setNextHop(senderIP)
@@ -332,6 +332,7 @@ def multicastSender(pipe,ipList):
                                 garbage[entry.ip].activate()
                             else:
                                 timeout[entry.ip].reset()
+                        
             
             
         for key in entries:
