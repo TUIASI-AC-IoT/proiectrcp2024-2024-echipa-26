@@ -163,8 +163,8 @@ def multicastSender(pipe,ipList):
     while True:
         if pipe.poll(0.1):
             message, sender, sock = pipe.recv()
-            
-            if sock[0]!=multicastIP:
+            print(f'msg primit de la {str(sender)} pe sock {str(sock)}')
+            if sock[0] != multicastIP:
                 interfaces[sock[0]] = sender[0]
                 print(interfaces)
             
@@ -176,7 +176,7 @@ def multicastSender(pipe,ipList):
                 if len(entriesMsg) == 0:
                     continue
                 if len(entriesMsg) == 1 and entriesMsg[0].AF_id == 0 and entriesMsg[0].metric == INF:
-                    print('am primit req pt tot')
+                    print('am primit req pt tot de la {str(sender)}')
                     m = Message(Commands.RESPONSE, Versions.V2, list(entries.values()))
                     b = messageToBytes(m)
                     socketList[0].sendto(b,sender)
@@ -277,8 +277,6 @@ def multicastSender(pipe,ipList):
                 print(f'am trimis catre {receiverIP} {len(splitHorizon)} update')
 
             timer.reset()
-            
-            
             
         if triggeredUpdate is not None:
             if triggeredUpdate.tick():
