@@ -176,7 +176,7 @@ def multicastSender(pipe,ipList):
                 if len(entriesMsg) == 0:
                     continue
                 if len(entriesMsg) == 1 and entriesMsg[0].AF_id == 0 and entriesMsg[0].metric == INF:
-                    print(f'am primit req pt tot de la {str(sender)}')
+                    print(f'am primit req pt tot de la {str(sender)} trimit pe {str(socketList[0].getcokname())}')
                     m = Message(Commands.RESPONSE, Versions.V2, list(entries.values()))
                     b = messageToBytes(m)
                     socketList[0].sendto(b,sender)
