@@ -239,7 +239,23 @@ def multicastSender(pipe,ipList):
                                 timeout[entry.ip].reset()
             
             
-        
+        for key in entries:
+            if timeout[key].tick():
+                entries[key].setMetric(INF)
+                flags[key]=Flags.CHANGED
+                timeout[key].deactivate()
+                garbage[key].activate()
+                if triggeredUpdate is None:
+                    triggeredUpdate = Timer(randint(1,5))
+                    triggeredUpdate.activate()
+                
+        for key in entries.keys():
+            if garbage[key].tick():
+                del timeout[key]
+                del entries[key]
+                del flags[key]
+                del garbage[key]
+                
         if timer.tick():
             triggeredUpdate = None
             #generate message and send it multicast
