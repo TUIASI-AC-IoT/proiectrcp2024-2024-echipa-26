@@ -203,15 +203,15 @@ def multicastSender(pipe,ipList):
                     for ip in ipList:
                         
                         if ip[0] == entry.ip:
-                            print('OPS ignored')
                             mine = True
                             break
                     if mine:
                         continue
                     
-                    
+                    entry.metric = int(min(entry.metric+1, INF))
                     if entry.ip not in entries and entry.metric != INF:
-                        entry.metric = int(min(entry.metric+1, INF))
+                        
+                        print(f'entry nou cu metrica{entry.metric}')
                         entry.nextHop = senderIP
                         entries[entry.ip]= entry
                         timeout[entry.ip] = Timer(120)
@@ -224,9 +224,9 @@ def multicastSender(pipe,ipList):
                         
                     else:
                         
-                        
+                        print('entry vechi')
                         if entry.metric != entries[entry.ip].getMetric():
-                            
+                            print('se schimba entry vechi')
                             entries[entry.ip].setMetric(entry.metric)
                             entries[entry.ip].setNextHop(senderIP)
                             flags[entry.ip] = Flags.CHANGED
