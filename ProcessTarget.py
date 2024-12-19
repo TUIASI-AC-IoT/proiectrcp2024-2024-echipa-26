@@ -296,7 +296,7 @@ def multicastSender(pipe,ipList):
                     
                     for ip in ipList:
                         # de adaugat si comparatia cu subnet
-                        if ip[0] == entry.nextHop:
+                        if ip[0] == entry.ip:
                             print('wtf')
                             mine = True
                             break
