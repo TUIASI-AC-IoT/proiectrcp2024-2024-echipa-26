@@ -110,7 +110,7 @@ def multicastSender(pipe,ipList):
     timeout = dict()
     garbage = dict()
     flags = dict()
-    #interfaces = dict()
+    interfaces = dict()
     
     def usr1(a,b):
         f = open('table.txt', 'w')
@@ -165,7 +165,8 @@ def multicastSender(pipe,ipList):
             message, sender, sock = pipe.recv()
             
             
-            
+            interfaces[sender[0]] = sock[0]
+            print(interfaces)
             
             
             command = message.command
