@@ -1,2 +1,7 @@
-update schema cod
-are sens sa trimitem raspuns la un req care contine entries? (rfc ul pare ca zice ca e pt debugging chestia asta)
+- update schema cod
+- are sens sa trimitem raspuns la un req care contine entries? (rfc ul pare ca zice ca e pt debugging chestia asta)
+- timere custom (eventual metrici, etc..)
+- Split Horizon
+- interfata de terminat (almost done)
+- aranjare cod
+- Manager
