@@ -292,7 +292,7 @@ def multicastSender(pipe,ipList):
                     # if myIP not in interfaces:
                     #     continue
                     # receiverIP = interfaces[myIP]
-                    # splitHorizon = []
+                    splitHorizon = []
                     for key in entries.keys():
                         # if entries[key].nextHop != receiverIP:   
                         splitHorizon.append(entries[key])
