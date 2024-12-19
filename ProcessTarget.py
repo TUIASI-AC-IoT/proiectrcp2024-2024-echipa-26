@@ -186,7 +186,7 @@ def multicastSender(pipe,ipList):
             senderPort= sender[1]
             senderIP=sender[0]
             if command == Commands.RESPONSE:
-                print(f'am primit {len(entriesMsg)} entries')
+                print(f'am primit {len(entriesMsg)} entries de la {senderIP}')
                 if senderPort != multicastPort:
                     continue
                 for entry in entriesMsg:
@@ -201,9 +201,11 @@ def multicastSender(pipe,ipList):
                     mine = False
                     
                     for ip in ipList:
-                        if ip == entry.nextHop:
+                        print(ip+' '+entry.ip)
+                        if ip == entry.ip:
                             print('OPS ignored')
                             mine = True
+                            break
                     if mine:
                         continue
                     
