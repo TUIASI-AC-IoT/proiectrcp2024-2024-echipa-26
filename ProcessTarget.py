@@ -176,6 +176,7 @@ def multicastSender(pipe,ipList):
                 if len(entriesMsg) == 0:
                     continue
                 if len(entriesMsg) == 1 and entriesMsg[0].AF_id == 0 and entriesMsg[0].metric == INF:
+                    print('am primit req pt tot')
                     m = Message(Commands.RESPONSE, Versions.V2, list(entries.values()))
                     b = messageToBytes(m)
                     socketList[0].sendto(b,sender)
@@ -273,6 +274,8 @@ def multicastSender(pipe,ipList):
                 m = Message(command=Commands.RESPONSE, version=Versions.V2,RIPentries=splitHorizon)
                 b = messageToBytes(m)
                 s.sendto(b, multicast)
+                print(f'am trimis catre {receiverIP} {len(splitHorizon)} update')
+
             timer.reset()
             
             
@@ -297,4 +300,5 @@ def multicastSender(pipe,ipList):
                             splitHorizon.append(entries[key])
                     m = Message(Commands.RESPONSE, Versions.V2, splitHorizon)
                     b = messageToBytes(m)
+                    print(f'am trimis catre {receiverIP} {len(splitHorizon)} trg update')
                     s.sendto(b, multicast) 
