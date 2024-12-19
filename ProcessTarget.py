@@ -170,6 +170,7 @@ def multicastSender(pipe,ipList):
             
             command = message.command
             entriesMsg = message.entries
+            
             if command == Commands.REQUEST:
                 if len(entriesMsg) == 0:
                     continue
@@ -201,7 +202,7 @@ def multicastSender(pipe,ipList):
                     
                     for ip in ipList:
                         # de adaugat si comparatia cu subnet
-                        if ip[0] == entry.ip:
+                        if ip[0] == entry.nextHop:
                             mine = True
                             break
                     if mine:
@@ -249,7 +250,7 @@ def multicastSender(pipe,ipList):
                     triggeredUpdate.activate()
                 
         for key in garbage.keys():
-            if key in garbage and garbage[key].tick():
+            if garbage[key].tick():
                 del timeout[key]
                 del entries[key]
                 del flags[key]
