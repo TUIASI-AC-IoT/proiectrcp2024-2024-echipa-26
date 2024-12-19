@@ -1,3 +1,4 @@
+import multiprocessing.managers
 import multiprocessing.queues
 from time import sleep, time
 from random import seed, randint
@@ -9,6 +10,13 @@ from multiprocessing.managers import BaseManager
 
 
 
+
+class MyManager(multiprocessing.managers.BaseManager):
+    pass
+
+
+MyManager.register('RIPEntry', RIPEntry)
+MyManager.register('Timer', Timer)
 
 def main():
 
@@ -31,10 +39,31 @@ def main():
     
     
     
+    myManager = MyManager()
+    myManager.start()
+    manager = multiprocessing.Manager()
+    
+    timeout = manager.dict()
+    garbage = manager.dict()
+    flags = manager.dict()
+    entries = manager.dict()
 
     
+
+
+    for ip in ipList:
+        
+        e = myManager.RIPEntry()
+        e.setIP(ip[0])
+        e.setNextHop(ip[0])
+        e.setSubnet(ip[1])
+
+        entries[ip[0]] = e
+        flags[ip[0]] = Flags.UNCHANGED
+        timeout[ip[0]] = myManager.Timer(40)
+        garbage[ip[0]] = myManager.Timer(30)
     
-    
+    table = (entries, flags, timeout, garbage)
     sender, listener = multiprocessing.Pipe(False)
     
     
@@ -68,6 +97,9 @@ def main():
 
     listenerProcess.join()
     senderProcess.join()
+
+    myManager.shutdown()
+    manager.shutdown()
     
 
     

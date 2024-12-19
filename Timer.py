@@ -34,7 +34,8 @@ class Timer:
     def isRunning(self):
         return not (self.timer == -1)
     
-    
+    def setTimeout(self, timeout):
+        self.timeout = timeout
     def reset(self):
         if self.timer != -1:
             self.timer = time()
