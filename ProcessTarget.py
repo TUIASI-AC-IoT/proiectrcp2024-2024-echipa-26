@@ -52,7 +52,7 @@ def multicastListen(pipe,IPSubnetList):
             data, sender = receiver.recvfrom(1024)
             msg = bytesToMessage(data)
             pipe.send((msg, sender, (sockDict[receiver], multicastPort)))
-            
+            print(f'Msg from {str(sender)} pe sock: {sockDict[receiver]}, multicast: {receiver.getsockname()[0]==multicastIP}')
             continue
             
             
@@ -309,6 +309,8 @@ def multicastSender(pipe, IPSubnetList):
     
     socketList = []
     multicast = (multicastIP, multicastPort)
+
+    socketDict = dict()
 
     for ip in IPSubnetList:
         sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
