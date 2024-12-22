@@ -300,7 +300,7 @@ def multicastSender(pipe, IPSubnetList):
         f.write(str(interfaces))
         entries = table.getAllEntries()
         for i in entries:
-            f.write(str(entries[i]))
+            f.write(str(i))
             f.write("\n\n")
             
         
