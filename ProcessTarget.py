@@ -34,15 +34,14 @@ def multicastListen(pipe,IPSubnetList):
         sockDict[simpleReceiver]=ip[0]
     
     
-
+    multicastReceiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
+    multicastReceiver.bind((multicastIP, multicastPort))
     for ip in IPSubnetList:
-        multicastReceiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
-        multicastReceiver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        multicastReceiver.bind((multicastIP, multicastPort))
+        
         r = struct.pack("=4s4s", socket.inet_aton(multicastIP), socket.inet_aton(ip[0]))
         multicastReceiver.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, r)
-        socketList.append(multicastReceiver)
-        sockDict[multicastReceiver] = ip[0]
+    socketList.append(multicastReceiver)
+    #sockDict[multicastReceiver] = ip[0]
 
 
     
