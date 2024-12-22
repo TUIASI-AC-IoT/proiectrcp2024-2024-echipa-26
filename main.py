@@ -20,14 +20,14 @@ MyManager.register('Timer', Timer)
 
 def main():
 
-    ipList = [] # lista de tuple
+    IPSubnetList = [] # lista de tuple
     ID = environ['ID']
     path = f'/home/tc/pr/cfg/r{ID}'
     for config in listdir(path):
         configPath = path+f'/{config}'
         file = open(configPath)
         lines = file.readlines()
-        ipList.append((lines[2][3:-1],lines[3][7:-1]))
+        IPSubnetList.append((lines[2][3:-1],lines[3][7:-1]))
 
     #TODO cfg
     #read cfg (timers etc)
@@ -51,7 +51,7 @@ def main():
     
 
 
-    for ip in ipList:
+    for ip in IPSubnetList:
         
         e = myManager.RIPEntry()
         e.setIP(ip[0])
@@ -67,8 +67,8 @@ def main():
     sender, listener = multiprocessing.Pipe(False)
     
     
-    listenerProcess = multiprocessing.Process(target = multicastListen, args=(listener,ipList))
-    senderProcess = multiprocessing.Process(target = multicastSender, args=(sender,ipList))
+    listenerProcess = multiprocessing.Process(target = multicastListen, args=(listener,IPSubnetList))
+    senderProcess = multiprocessing.Process(target = multicastSender, args=(sender,IPSubnetList))
 
     listenerProcess.start()
     senderProcess.start()
