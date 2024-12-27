@@ -208,3 +208,4 @@ Al doilea proces verifica daca exista mesaje de procesat de la primul proces. Da
 - https://en.wikipedia.org/wiki/Private_network
 - https://github.com/github/gitignore/blob/main/Python.gitignore
 - https://docs.python.org/3/howto/sockets.html
+- https://linux.die.net/man/7/ip
