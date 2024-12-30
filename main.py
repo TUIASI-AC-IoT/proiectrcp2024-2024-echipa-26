@@ -101,6 +101,8 @@ def main():
     myManager.shutdown()
     manager.shutdown()
     
+    #test doar daca se vede interfata pe tinycore
+    wrapper(CLI)
 
     
 
