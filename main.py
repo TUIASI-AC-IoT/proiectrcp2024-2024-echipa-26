@@ -7,7 +7,7 @@ from ProcessTarget import *
 from Message import *
 import multiprocessing
 from multiprocessing.managers import BaseManager
-
+from CLI import *
 
 
 

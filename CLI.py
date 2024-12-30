@@ -310,6 +310,7 @@ def search(stdscr):
 
 def CLI(stdscr):
     #loadingScreen(stdscr)
+    searchAndBrowse(stdscr)
     startSettings(stdscr)
     endSettings(stdscr)
 
