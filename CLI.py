@@ -5,33 +5,29 @@ import time
 
 # o sa mai fac curat
 
-stdscr = curses.initscr()
-curses.start_color()
-height, width = stdscr.getmaxyx()
-middle_y = height // 2
-middle_x = width // 2
-
-curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
-curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-curses.init_pair(10, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-G_B = curses.color_pair(1)
-Y_B = curses.color_pair(2)
-M = curses.color_pair(10)
-
-def startSettings(stdscr):
+def startSettings():
+    stdscr = curses.initscr()
     stdscr.clear()
     curses.noecho()
     curses.cbreak()
     stdscr.keypad(True)
-
+    height, width = stdscr.getmaxyx()
+    middle_y = height // 2
+    middle_x = width // 2
+    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+    curses.init_pair(10, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+    G_B = curses.color_pair(1)
+    Y_B = curses.color_pair(2)
+    M = curses.color_pair(10)
+    return stdscr, G_B, Y_B, M, middle_x, middle_y
 
 def endSettings(stdscr):
     curses.nocbreak()
     stdscr.keypad(False)
     curses.echo()
 
-
-def searchAndBrowse(stdscr):
+def searchAndBrowse(stdscr, G_B, Y_B, M, middle_x, middle_y):
     stdscr.clear()
     curses.curs_set(0)
     curses.start_color()
@@ -81,20 +77,21 @@ def searchAndBrowse(stdscr):
             if rectangles[current_index]["name"] == "search":
                 stdscr.attroff(curses.color_pair(1))
                 stdscr.attroff(curses.color_pair(2))
-                search(stdscr) 
+                search(stdscr, G_B, Y_B, M, middle_x, middle_y) 
             elif rectangles[current_index]["name"] == "modify":
                 stdscr.attroff(curses.color_pair(1))
                 stdscr.attroff(curses.color_pair(2))
-                modify(stdscr)
+                modify(stdscr, middle_x, middle_y)
             elif rectangles[current_index]["name"] == "browse":
                 stdscr.addstr(17, 0, "BROWSE NU ARE NIMIC INCA :)")
             stdscr.refresh()
             stdscr.getch()
         elif key == ord('q'):  
+            endSettings(stdscr)
             break
 
 
-def modify(stdscr):
+def modify(stdscr, middle_x, middle_y):
     stdscr.clear()
     curses.curs_set(1)
 
@@ -163,7 +160,7 @@ def modify(stdscr):
 
 
 
-def search(stdscr):
+def search(stdscr, G_B, Y_B, M, middle_x, middle_y):
     curses.curs_set(0)  
     stdscr.clear()
 
@@ -310,6 +307,7 @@ def search(stdscr):
 
 def CLI(stdscr):
     #loadingScreen(stdscr)
-    searchAndBrowse(stdscr)
-    startSettings(stdscr)
-    endSettings(stdscr)
+    stdscr, G_B, Y_B, M, middle_x, middle_y = startSettings()
+    searchAndBrowse(stdscr, G_B, Y_B, M, middle_x, middle_y)
+
+wrapper(CLI)
