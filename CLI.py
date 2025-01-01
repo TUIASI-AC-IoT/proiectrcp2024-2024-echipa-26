@@ -309,5 +309,3 @@ def CLI(stdscr):
     #loadingScreen(stdscr)
     stdscr, G_B, Y_B, M, middle_x, middle_y = startSettings()
     searchAndBrowse(stdscr, G_B, Y_B, M, middle_x, middle_y)
-
-wrapper(CLI)
