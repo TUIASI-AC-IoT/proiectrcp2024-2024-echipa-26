@@ -313,5 +313,3 @@ def CLI(stdscr):
     searchAndBrowse(stdscr)
     startSettings(stdscr)
     endSettings(stdscr)
-
-wrapper(CLI) # asa trebuie apelat pt debugging daca sunt erori
