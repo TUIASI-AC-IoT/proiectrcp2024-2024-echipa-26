@@ -70,8 +70,8 @@ def main():
     listenerProcess = multiprocessing.Process(target = multicastListen, args=(listener,IPSubnetList))
     senderProcess = multiprocessing.Process(target = multicastSenderOld, args=(sender,IPSubnetList))
 
-    listenerProcess.start()
-    senderProcess.start()
+    #listenerProcess.start()
+    #senderProcess.start()
 
 
 
