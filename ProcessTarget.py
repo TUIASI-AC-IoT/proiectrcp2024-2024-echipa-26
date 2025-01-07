@@ -25,51 +25,29 @@ def multicastListen(pipe,IPSubnetList):
 
     # entries, timeout, garbage, flags = table
     
-    sockDict=dict()
     for ip in IPSubnetList:
         simpleReceiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
         simpleReceiver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         simpleReceiver.bind((ip[0], multicastPort))
         socketList.append(simpleReceiver)
-        sockDict[simpleReceiver]=ip[0]
     
-    
+    multicastReceiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
+    multicastReceiver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    multicastReceiver.bind((multicastIP, multicastPort))
+
 
     for ip in IPSubnetList:
-        multicastReceiver = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
-        multicastReceiver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        multicastReceiver.bind((multicastIP, multicastPort))
         r = struct.pack("=4s4s", socket.inet_aton(multicastIP), socket.inet_aton(ip[0]))
         multicastReceiver.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, r)
-        socketList.append(multicastReceiver)
-        sockDict[multicastReceiver] = ip[0]
-
-
+    socketList.append(multicastReceiver)
+    
     
     while True:
         ready_to_read, _,_ = select.select(socketList,[],[], 0.1)
         for receiver in ready_to_read:
             data, sender = receiver.recvfrom(1024)
             msg = bytesToMessage(data)
-            pipe.send((msg, sender, (sockDict[receiver], multicastPort)))
-            print(f'Msg from {str(sender)} pe sock: {sockDict[receiver]}, multicast: {receiver.getsockname()[0]==multicastIP}')
-            continue
-            
-            
-            
-            if entriesMsg[0].ip == '0.0.0.0':
-                pipe.send([Signals.SEND_ENTIRE_TABLE, sender])
-            else:
-                table, interfaces = getValues(queue)
-                entries, timeout, garbage, flags = table
-                for ent in entriesMsg:
-                    entries[ent.ip] = RIPEntry().generateFrom(ent)
-                table=(entries, timeout, garbage, flags)
-                putValues(queue, (table, interfaces))
-            print('AM PROCESAT CE AM PRIMIT')
-            myIP = receiver.getsockname()[0]
-            if myIP != multicastIP:
-                interfaces[senderIP] = myIP
+            pipe.send((msg, sender, receiver.getsockname()))
             
             
                         
@@ -297,7 +275,7 @@ def multicastSender(pipe, IPSubnetList):
     
     def usr1(a,b):
         f = open('table.txt', 'w')
-        f.write(str(interfaces))
+        f.write(str(interfaces) + '\n\n')
         entries = table.getAllEntries()
         for i in entries:
             f.write(str(i))
@@ -310,7 +288,6 @@ def multicastSender(pipe, IPSubnetList):
     socketList = []
     multicast = (multicastIP, multicastPort)
 
-    socketDict = dict()
 
     for ip in IPSubnetList:
         sender = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, proto=17)
@@ -324,7 +301,7 @@ def multicastSender(pipe, IPSubnetList):
         req = messageToBytes(req)
         sender.sendto(req, multicast)
         socketList.append(sender)
-    
+        
     
     while True:
         if pipe.poll(0.1):
@@ -338,7 +315,9 @@ def multicastSender(pipe, IPSubnetList):
                 if senderPort != multicastPort:
                     continue
                 table.answerResponse(message.entries, sender)
-        
+                if senderPort == multicastPort:
+                    table.answerRequest(message.entries, sender)
+                
         table.checkTimeout()
         table.checkGarbage()
         table.checkTimer(socketList, interfaces)
