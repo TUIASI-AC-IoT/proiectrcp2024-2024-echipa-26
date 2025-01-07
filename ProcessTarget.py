@@ -5,7 +5,7 @@ import struct
 import signal
 import select
 from typing import List,Tuple, Dict
-
+import logging
 
 from RIPEntry import *
 from Message import *
@@ -18,7 +18,14 @@ multicast = (multicastIP, multicastPort)
 class Signals:
     SEND_ENTIRE_TABLE = 0
     TRIGERRED_UPDATE = 1
- 
+
+logger = logging.getLogger('log')
+logger.setLevel(logging.DEBUG)
+file = logging.FileHandler('log')
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file.setFormatter(formatter)
+logger.addHandler(file)
+
 def multicastListen(pipe,IPSubnetList):
     
     socketList =[]
@@ -97,7 +104,6 @@ class Table:
         if len(entriesMsg) == 0:
             return
         if len(entriesMsg) == 1 and entriesMsg[0].AF_id == 0 and entriesMsg[0].metric == INF:
-            print(f'am primit req pt tot de la {str(sender)} trimit pe {str(sock.getsockname())}')
             toBeSent = []
             for neighbour in self.entriesFrom:
                 for dest in self.entriesFrom[neighbour]:
@@ -105,6 +111,8 @@ class Table:
             m = Message(Commands.RESPONSE, Versions.V2, toBeSent)
             b = messageToBytes(m)
             sock.sendto(b,sender)
+            logger.debug(f'Received request for the entire table from {str(sender)}. Sent {len(toBeSent)} entries.')
+            
             return
         for entry in entriesMsg:
             #NOT IMPLEMENTED
@@ -133,6 +141,7 @@ class Table:
             
             #must be deleted after split horizon works
             if entry.nextHop in self.entriesFrom['0.0.0.0']:
+                logger.debug('Entry ignored :(')
                 continue
             
             neighbour = sender[0]
@@ -163,6 +172,7 @@ class Table:
                 
                 
             else:
+                logger.debug(f'Received a new route to {entry.ip}.')
                 # New route
                 if sender[0] not in self.entriesFrom:
                     self.entriesFrom[neighbour] = dict()
@@ -180,6 +190,7 @@ class Table:
         '''
         Sends the triggered update
         '''
+        logger.debug(f'Triggered update activated.')
         changedRoutes = []
         for neighbour in self.entriesFrom:
             for dest in self.entriesFrom[neighbour]:
@@ -210,6 +221,7 @@ class Table:
         '''
         Sends an update
         '''
+        logger.debug(f'Update activated.')
         for s in sockets:
             splitHorizon = []
             myIP = s.getsockname()[0]
@@ -232,6 +244,7 @@ class Table:
         for neighbour in self.timeout:
             for dest in self.timeout[neighbour]:
                 if self.timeout[neighbour][dest].tick():
+                    logger.debug(f'Deleted route to {dest}')
                     self.entriesFrom[neighbour][dest].setMetric(INF)
                     self.timeout[neighbour][dest].deactivate()
                     self.garbage[neighbour][dest].activate()
@@ -300,8 +313,9 @@ def multicastSender(pipe, IPSubnetList):
         req = Message(Commands.REQUEST, Versions.V2, [nullEntry])
         req = messageToBytes(req)
         sender.sendto(req, multicast)
+        logger.debug(f'Sent request to the {ip[0]} group.')
         socketList.append(sender)
-        
+
     
     while True:
         if pipe.poll(0.1):
