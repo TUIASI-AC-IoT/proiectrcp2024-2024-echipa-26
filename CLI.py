@@ -40,7 +40,7 @@ def searchAndBrowse(stdscr, G_B, Y_B, M, middle_x, middle_y):
     rectangles = [
         {"name": "browse", "coords": (1, 10, 7, 35), "label": "BROWSE"},
         {"name": "search", "coords": (1, 40, 7, 65), "label": "SEARCH"},
-        {"name": "modify", "coords": (9, 25, 15, 50), "label": "MODIFY"},  
+        {"name": "commands", "coords": (9, 25, 15, 50), "label": "COMMANDS"},  
     ]
 
     current_index = 0
@@ -78,12 +78,12 @@ def searchAndBrowse(stdscr, G_B, Y_B, M, middle_x, middle_y):
                 stdscr.attroff(curses.color_pair(1))
                 stdscr.attroff(curses.color_pair(2))
                 search(stdscr, G_B, Y_B, M, middle_x, middle_y) 
-            elif rectangles[current_index]["name"] == "modify":
+            elif rectangles[current_index]["name"] == "commands":
                 stdscr.attroff(curses.color_pair(1))
                 stdscr.attroff(curses.color_pair(2))
                 modify(stdscr, middle_x, middle_y)
             elif rectangles[current_index]["name"] == "browse":
-                stdscr.addstr(17, 0, "BROWSE NU ARE NIMIC INCA :)")
+                browse(stdscr, G_B, Y_B, M, middle_x, middle_y)
             stdscr.refresh()
             stdscr.getch()
         elif key == ord('q'):  
@@ -99,7 +99,7 @@ def modify(stdscr, middle_x, middle_y):
 
     modify_win = curses.newwin(5, 50, 0, width // 2 - 25)
     modify_win.box()
-    modify_win.addstr(1, 20, "COMMANDS", curses.A_BOLD)
+    modify_win.addstr(1, 19, "COMMANDS", curses.A_BOLD | curses.A_REVERSE)
 
     edit_win = modify_win.derwin(1, 40, 3, 5)
     cutie = Textbox(edit_win)
@@ -150,15 +150,13 @@ def modify(stdscr, middle_x, middle_y):
 
         modify_win.clear()
         modify_win.box()
-        modify_win.addstr(1, 20, "COMMANDS", curses.A_BOLD)
+        modify_win.addstr(1, 19, "COMMANDS", curses.A_BOLD)
         stdscr.refresh()
         modify_win.refresh()
 
         edit_win.move(0, 0)  
         stdscr.refresh()
         modify_win.refresh()
-
-
 
 def search(stdscr, G_B, Y_B, M, middle_x, middle_y):
     curses.curs_set(0)  
@@ -167,7 +165,7 @@ def search(stdscr, G_B, Y_B, M, middle_x, middle_y):
     
     curses.start_color()
 
-    stdscr.addstr(0, 37, "SEARCH", curses.A_BOLD | Y_B)
+    stdscr.addstr(0, 37, "SEARCH", curses.A_BOLD | Y_B | curses.A_REVERSE)
     win = curses.newwin(5, 50, 1, middle_x - 25)
     win.attron(G_B)  
     win.box()
@@ -305,6 +303,47 @@ def search(stdscr, G_B, Y_B, M, middle_x, middle_y):
 
     curses.flushinp()    
 
+def window_text(window, G_B):
+
+    window.addstr(1,2, '> AF_id :', curses.A_BOLD | G_B)
+    window.addstr(2,2, '> IP :', curses.A_BOLD | G_B)
+    window.addstr(3,2, '> Subnet : ', curses.A_BOLD | G_B)
+    window.addstr(4,2, '> NextHop : ', curses.A_BOLD | G_B)
+    window.addstr(5,2 ,'> Metrica : ', curses.A_BOLD | G_B)
+    window.addstr(6,2, '> TimeOut : ', curses.A_BOLD | G_B)
+    window.addstr(7,2, '> Garbage : ', curses.A_BOLD | G_B)
+    window.addstr(8,2, '> Flags : ', curses.A_BOLD | G_B)
+
+def browse(stdscr, G_B, Y_B, M, middle_x, middle_y):
+    curses.curs_set(0)  
+    stdscr.clear()
+    curses.start_color()
+
+    winArr = []
+
+    win1 = curses.newwin(10, 38, 3, 1)
+    window_text(win1, G_B)
+    win1.box()
+    win2 = curses.newwin(10, 38, 3, 41)
+    window_text(win2, G_B)
+    win2.box()
+    win3 = curses.newwin(10, 38, 14, 1)
+    window_text(win3, G_B)
+    win3.box()
+    win4 = curses.newwin(10, 38, 14, 41)
+    window_text(win4, G_B)
+    win4.box()   
+    stdscr.refresh()
+    win4.refresh()
+    win3.refresh()
+    win2.refresh()
+    win1.refresh()
+    stdscr.addstr(0, 37, "BROWSE", curses.A_BOLD | curses.A_REVERSE | Y_B)
+
+    while True:
+        key = stdscr.getch()
+        if key == ord('q'):
+            break
 def CLI(stdscr):
     #loadingScreen(stdscr)
     stdscr, G_B, Y_B, M, middle_x, middle_y = startSettings()
