@@ -314,32 +314,84 @@ def window_text(window, G_B):
     window.addstr(7,2, '> Garbage : ', curses.A_BOLD | G_B)
     window.addstr(8,2, '> Flags : ', curses.A_BOLD | G_B)
 
+
+def parseText():
+    
+    af = []
+    ip = []
+    subnet = []
+    nexthop = []
+    metric = []
+    routeTag = []
+
+    with open("demo.txt", "r") as file:
+        for line in file:
+            line = line.strip() 
+            if line.startswith("AF_id:"):
+                af.append(line.split(":", 1)[1].strip())
+            elif line.startswith("IP:"):
+                ip.append(line.split(":", 1)[1].strip())
+            elif line.startswith("Subnet:"):
+                subnet.append(line.split(":", 1)[1].strip())
+            elif line.startswith("NextHop:"):
+                nexthop.append(line.split(":", 1)[1].strip())
+            elif line.startswith("Metric:"):
+                metric.append(line.split(":", 1)[1].strip())
+            elif line.startswith("Route Tag:"):
+                routeTag.append(line.split(":", 1)[1].strip())
+    
+    return {
+        "AF_id": af,
+        "IP": ip,
+        "Subnet": subnet,
+        "NextHop": nexthop,
+        "Metric": metric,
+        "Route Tag": routeTag
+    }
+          
 def browse(stdscr, G_B, Y_B, M, middle_x, middle_y):
     curses.curs_set(0)  
     stdscr.clear()
     curses.start_color()
 
+    parsed_data = parseText()
+
     winArr = []
 
-    win1 = curses.newwin(10, 38, 3, 1)
-    window_text(win1, G_B)
-    win1.box()
-    win2 = curses.newwin(10, 38, 3, 41)
-    window_text(win2, G_B)
-    win2.box()
-    win3 = curses.newwin(10, 38, 14, 1)
-    window_text(win3, G_B)
-    win3.box()
-    win4 = curses.newwin(10, 38, 14, 41)
-    window_text(win4, G_B)
-    win4.box()   
-    stdscr.refresh()
-    win4.refresh()
-    win3.refresh()
-    win2.refresh()
-    win1.refresh()
-    stdscr.addstr(0, 37, "BROWSE", curses.A_BOLD | curses.A_REVERSE | Y_B)
 
+    win1 = curses.newwin(10, 38, 3, 1)
+    winArr.append(win1)
+    win2 = curses.newwin(10, 38, 3, 41)
+    winArr.append(win2)
+    win3 = curses.newwin(10, 38, 14, 1)
+    winArr.append(win3)
+    win4 = curses.newwin(10, 38, 14, 41)
+    winArr.append(win4)
+    
+    for i, window in enumerate(winArr):
+        window.box()
+        window_text(window, G_B)
+
+        if i < len(parsed_data["AF_id"]):
+            af_id = parsed_data["AF_id"][i]
+            ip = parsed_data["IP"][i]
+            subnet = parsed_data["Subnet"][i]
+            nexthop = parsed_data["NextHop"][i]
+            metric = parsed_data["Metric"][i]
+            route_tag = parsed_data["Route Tag"][i]
+
+            window.addstr(1, 20, af_id, M | curses.A_BOLD)
+            window.addstr(2, 20, ip, M | curses.A_BOLD)
+            window.addstr(3, 20, subnet, M | curses.A_BOLD)
+            window.addstr(4, 20, nexthop, M | curses.A_BOLD)
+            window.addstr(5, 20, metric, M | curses.A_BOLD)
+            window.addstr(6, 20, route_tag, M | curses.A_BOLD)
+
+    stdscr.refresh()    
+    for win in winArr:
+        win.refresh()
+    
+    stdscr.addstr(0, 37, "BROWSE", curses.A_BOLD | curses.A_REVERSE | Y_B)
     while True:
         key = stdscr.getch()
         if key == ord('q'):
@@ -348,3 +400,5 @@ def CLI(stdscr):
     #loadingScreen(stdscr)
     stdscr, G_B, Y_B, M, middle_x, middle_y = startSettings()
     searchAndBrowse(stdscr, G_B, Y_B, M, middle_x, middle_y)
+
+wrapper(CLI)
