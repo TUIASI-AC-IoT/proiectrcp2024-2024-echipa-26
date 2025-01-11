@@ -369,27 +369,37 @@ def browse(stdscr, G_B, Y_B, M, middle_x, middle_y):
     win4 = curses.newwin(10, 38, 14, 41)
     winArr.append(win4)
 
+    total_data = len(parsed_data["AF_id"])
     active_window = 0  
-    cols = 2  
-    stdscr.refresh()
+    cols = 2
+    rows = 2
+    current_page = 0
+    max_windows = cols * rows
 
-    def update_windows():
+    stdscr.refresh()
+    
+    def draw_borders():
         for i, window in enumerate(winArr):
             if i == active_window:
                 window.attron(curses.color_pair(8))
             else:
                 window.attroff(curses.color_pair(8))
-
             window.box()
             window_text(window, G_B)
-
-            if i < len(parsed_data["AF_id"]):
-                af_id = parsed_data["AF_id"][i]
-                ip = parsed_data["IP"][i]
-                subnet = parsed_data["Subnet"][i]
-                nexthop = parsed_data["NextHop"][i]
-                metric = parsed_data["Metric"][i]
-                route_tag = parsed_data["Route Tag"][i]
+            window.refresh()
+    
+    def update_windows():
+        start_index = current_page * max_windows
+        for i, window in enumerate(winArr):
+            window.clear()
+            if (start_index + i) < total_data:
+                data_index = start_index + i
+                af_id = parsed_data["AF_id"][data_index]
+                ip = parsed_data["IP"][data_index]
+                subnet = parsed_data["Subnet"][data_index]
+                nexthop = parsed_data["NextHop"][data_index]
+                metric = parsed_data["Metric"][data_index]
+                route_tag = parsed_data["Route Tag"][data_index]
 
                 window.addstr(1, 20, af_id, C | curses.A_BOLD)
                 window.addstr(2, 20, ip, C | curses.A_BOLD)
@@ -400,11 +410,13 @@ def browse(stdscr, G_B, Y_B, M, middle_x, middle_y):
 
             window.refresh()
 
-    stdscr.addstr(0, 37, "BROWSE", curses.A_BOLD | curses.A_REVERSE | Y_B)
-
+    draw_borders()
     update_windows()
 
+    stdscr.addstr(0, 37, "BROWSE", curses.A_BOLD | curses.A_REVERSE | Y_B)
+
     while True:
+        draw_borders()
         key = stdscr.getch()
         if key == ord('q'):
             break
@@ -417,11 +429,17 @@ def browse(stdscr, G_B, Y_B, M, middle_x, middle_y):
         elif key == curses.KEY_DOWN:  
             if active_window + cols < len(winArr):  
                 active_window += cols
+            elif current_page < (total_data - 1) // max_windows:
+                current_page += 1
+                active_window = 0
+                update_windows()
         elif key == curses.KEY_UP:  
             if active_window - cols >= 0:  
                 active_window -= cols
-
-        update_windows()
+            elif current_page > 0:
+                current_page -= 1
+                active_window = 0
+                update_windows()
 
 def CLI(stdscr):
     #loadingScreen(stdscr)
