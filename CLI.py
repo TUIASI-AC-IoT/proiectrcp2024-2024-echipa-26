@@ -350,14 +350,15 @@ def parseText():
     }
           
 def browse(stdscr, G_B, Y_B, M, middle_x, middle_y):
-    curses.curs_set(0)  
+    curses.curs_set(0)
     stdscr.clear()
     curses.start_color()
-
+    curses.init_pair(8, curses.COLOR_BLACK, curses.COLOR_WHITE)  
+    curses.init_pair(11, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    C = curses.color_pair(11)
     parsed_data = parseText()
 
     winArr = []
-
 
     win1 = curses.newwin(10, 38, 3, 1)
     winArr.append(win1)
@@ -367,35 +368,61 @@ def browse(stdscr, G_B, Y_B, M, middle_x, middle_y):
     winArr.append(win3)
     win4 = curses.newwin(10, 38, 14, 41)
     winArr.append(win4)
-    
-    for i, window in enumerate(winArr):
-        window.box()
-        window_text(window, G_B)
 
-        if i < len(parsed_data["AF_id"]):
-            af_id = parsed_data["AF_id"][i]
-            ip = parsed_data["IP"][i]
-            subnet = parsed_data["Subnet"][i]
-            nexthop = parsed_data["NextHop"][i]
-            metric = parsed_data["Metric"][i]
-            route_tag = parsed_data["Route Tag"][i]
+    active_window = 0  
+    cols = 2  
+    stdscr.refresh()
 
-            window.addstr(1, 20, af_id, M | curses.A_BOLD)
-            window.addstr(2, 20, ip, M | curses.A_BOLD)
-            window.addstr(3, 20, subnet, M | curses.A_BOLD)
-            window.addstr(4, 20, nexthop, M | curses.A_BOLD)
-            window.addstr(5, 20, metric, M | curses.A_BOLD)
-            window.addstr(6, 20, route_tag, M | curses.A_BOLD)
+    def update_windows():
+        for i, window in enumerate(winArr):
+            if i == active_window:
+                window.attron(curses.color_pair(8))
+            else:
+                window.attroff(curses.color_pair(8))
 
-    stdscr.refresh()    
-    for win in winArr:
-        win.refresh()
-    
+            window.box()
+            window_text(window, G_B)
+
+            if i < len(parsed_data["AF_id"]):
+                af_id = parsed_data["AF_id"][i]
+                ip = parsed_data["IP"][i]
+                subnet = parsed_data["Subnet"][i]
+                nexthop = parsed_data["NextHop"][i]
+                metric = parsed_data["Metric"][i]
+                route_tag = parsed_data["Route Tag"][i]
+
+                window.addstr(1, 20, af_id, C | curses.A_BOLD)
+                window.addstr(2, 20, ip, C | curses.A_BOLD)
+                window.addstr(3, 20, subnet, C | curses.A_BOLD)
+                window.addstr(4, 20, nexthop, C | curses.A_BOLD)
+                window.addstr(5, 20, metric, C | curses.A_BOLD)
+                window.addstr(6, 20, route_tag, C | curses.A_BOLD)
+
+            window.refresh()
+
     stdscr.addstr(0, 37, "BROWSE", curses.A_BOLD | curses.A_REVERSE | Y_B)
+
+    update_windows()
+
     while True:
         key = stdscr.getch()
         if key == ord('q'):
             break
+        elif key == curses.KEY_RIGHT:  
+            if (active_window + 1) % cols != 0:  
+                active_window += 1
+        elif key == curses.KEY_LEFT:  
+            if active_window % cols != 0:  
+                active_window -= 1
+        elif key == curses.KEY_DOWN:  
+            if active_window + cols < len(winArr):  
+                active_window += cols
+        elif key == curses.KEY_UP:  
+            if active_window - cols >= 0:  
+                active_window -= cols
+
+        update_windows()
+
 def CLI(stdscr):
     #loadingScreen(stdscr)
     stdscr, G_B, Y_B, M, middle_x, middle_y = startSettings()
