@@ -116,7 +116,7 @@ class SharedTable:
         '''
         kill(getppid(), TRIGGER_UPDATE_SIGNAL)
     
-    def answerResponse(self, sender:Tuple[str,int], response:Message, myIP)->None:
+    def answerResponse(self, sender:Tuple[str,int], response:Message, myIP:str)->None:
         '''
         Method used to manage a response.
         '''
@@ -497,7 +497,7 @@ class Router:
                     pipe.send((msg, addr))
                 if msg.command == Commands.RESPONSE:
                     logger.debug(f'New response from {addr[0]}.')
-                    self.table.answerResponse(addr, msg)
+                    self.table.answerResponse(addr, msg, self.senderInterface[addr[0]])
     
     def send(self, pipe)->None:
         '''
