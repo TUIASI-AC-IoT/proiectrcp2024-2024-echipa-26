@@ -7,4 +7,5 @@
 
 #are rol de debug/faciliteaza munca
 
+clear
 python3 managerWIP.py

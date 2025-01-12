@@ -52,7 +52,7 @@ class SharedTable:
     '''
     Class for storing a routing table which is accesible by multiple processes.
     '''
-    def __init__(self, IPSubnetList:List[Tuple[str,str]], timeout = 180, garbage = 120)->None:
+    def __init__(self, IPSubnetList:List[Tuple[str,str]], timeoutVals:Dict[str,int], garbageVals:Dict[str,int], metricVals:Dict[str,int])->None:
         '''
         Constructs the initial table.
         '''
@@ -66,20 +66,27 @@ class SharedTable:
         self.timeout = self.manager.dict()
         self.garbage = self.manager.dict()
         
+        self.timeoutVals = self.manager.dict()
+        for IP in timeoutVals:
+            self.timeoutVals[IP] = timeoutVals[IP]
+        
+        self.garbageVals = self.manager.dict()
+        for IP in garbageVals:
+            self.garbageVals[IP]=garbageVals[IP]
+            
+        self.metricVals = self.manager.dict()
+        for IP in metricVals:
+            self.metricVals[IP] = metricVals[IP]
         
         
-        
-        self.parameters = self.manager.list()
-        self.parameters.append(timeout)
-        self.parameters.append(garbage)
 
         
         
         
         for IP, subnet in IPSubnetList:
             self.entries[IP] = self.objectManager.RIPEntry(ip=IP, subnet=subnet, nextHop = IP )
-            self.timeout[IP] = self.objectManager.Timer(self.parameters[0])
-            self.garbage[IP] = self.objectManager.Timer(self.parameters[1])
+            self.timeout[IP] = self.objectManager.Timer(self.timeoutVals[IP])
+            self.garbage[IP] = self.objectManager.Timer(self.garbageVals[IP])
             self.flags[IP] = Flags.UNCHANGED
             
     def answerRequest(self, req:Message)->Message:
@@ -109,7 +116,7 @@ class SharedTable:
         '''
         kill(getppid(), TRIGGER_UPDATE_SIGNAL)
     
-    def answerResponse(self, sender:Tuple[str,int], response:Message)->None:
+    def answerResponse(self, sender:Tuple[str,int], response:Message, myIP)->None:
         '''
         Method used to manage a response.
         '''
@@ -122,7 +129,7 @@ class SharedTable:
                 logger.erro(f'Entry with wrong metric: {entry.getMetric()}.')
                 continue
             
-            entry.setMetric((int(min(entry.getMetric()+1, INF))))
+            entry.setMetric((int(min(entry.getMetric()+self.metricVals[myIP], INF))))
             entry.setNextHop(sender[0])
             key = entry.getIP()
             if entry.getIP() in list(self.entries.keys()):
@@ -146,8 +153,8 @@ class SharedTable:
             else:
                 logger.debug(f'New route to {key}.')
                 self.entries[key] = self.objectManager.RIPEntry(other=entry)
-                self.timeout[key]=self.objectManager.Timer(self.parameters[0])
-                self.garbage[key]=self.objectManager.Timer(self.parameters[1])
+                self.timeout[key]=self.objectManager.Timer(self.timeout[myIP])
+                self.garbage[key]=self.objectManager.Timer(self.garbage[myIP])
                 self.flags[key] = Flags.CHANGED
                 self.timeout[key].activate()
                 self.triggerUpdate()
@@ -183,7 +190,11 @@ class SharedTable:
         self.objectManager.shutdown()
         self.manager.shutdown()
         
-    def setTimeout(self, newVal)->None:
+        
+        
+        
+        
+    def setTimeout(self, newVal:int, myIP:str, neighbourIP:str)->None:
         '''
         Changes the timeout for all the entries.
         '''
@@ -191,14 +202,17 @@ class SharedTable:
         if newVal <= 0:
             return
         
-        logger.debug(f'New timeout set: {newVal}.')
-        self.parameters[0] = newVal
-        for IP in self.timeout.keys():
-            self.timeout[IP].setTimeout(newVal)
-            self.timeout[IP].setBaseTimeout(newVal)
-        logger.debug(f'New timeout set: {newVal}.')
+       
+        self.timeoutVals[myIP] = newVal
+        
+        for IP in self.entries.keys():
+            if self.entries[IP].getNextHop() == neighbourIP:
+                self.timeout[IP].setTimeout(newVal)
+                self.timeout[IP].setBaseTimeout(newVal)
+        
+        logger.debug(f'New timeout set {newVal} for interface {myIP}')
             
-    def setGarbage(self, newVal)->None:
+    def setGarbage(self, newVal:int, myIP:str, neighbourIP:str)->None:
         
         '''
         Changes the garbage timeout for all the entries.
@@ -207,12 +221,35 @@ class SharedTable:
         if newVal<=0 :
             return
         
-        self.parameters[1] = newVal
-        for IP in self.garbage.keys():
-            self.garbage[IP].setTimeout(newVal)
-            self.garbage[IP].setBaseTimeout(newVal)
+        self.garbageVals[myIP] = newVal
+        
+        for IP in self.entries.keys():
+            if self.entries[IP].getNextHop() == neighbourIP:
+                self.garbage[IP].setTimeout(newVal)
+                self.garbage[IP].setBaseTimeout(newVal)
+        
+        
             
-        logger.debug(f'New garbage set: {newVal}')
+        logger.debug(f'New garbage set {newVal} for interface {myIP}')
+
+    def setMetric(self, newVal:int, myIP:str, neighborIP:str)->None:
+        '''
+        Changes the metric for packets coming from the myIP interface.
+        '''
+        
+        if newVal<=0 :
+            return
+        
+        diffMetric = self.metricVals[myIP] - newVal
+        self.metricVals[myIP] = newVal
+        
+        for IP in self.entries.keys():
+            if self.entries[IP].getNextHop() == neighborIP:
+                self.entries[IP].setMetric(min(self.entris[IP].getMetric()+diffMetric, INF))
+            
+        logger.debug(f'New metric set {newVal} for interface {myIP}')
+
+
 
     def getAllEntries(self)->List[RIPEntry]:
         '''
@@ -243,7 +280,7 @@ class Router:
     '''
     Class for simulating a router.
     '''
-    def __init__(self, IPSubnetList:List[Tuple[str,str]], timeout=180, garbage=120, update=30)->None:
+    def __init__(self, IPSubnetList:List[Tuple[str,str]], timeoutVals:Dict[str,int], garbageVals:Dict[str,int],metricVals:Dict[str,int], update=30)->None:
         '''
         Constructs the table and sockets.
         '''
@@ -253,7 +290,7 @@ class Router:
         
         
         
-        self.table = SharedTable(IPSubnetList, timeout,garbage)
+        self.table = SharedTable(IPSubnetList, timeoutVals, garbageVals, metricVals)  
         self.senderInterface = self.manager.dict()
         self.interfaceSender = self.manager.dict()
         
@@ -310,17 +347,24 @@ class Router:
         self.update.activate()
         self.cli()
         
-    def setTimeout(self, timeout:int)->None:
+    def setTimeout(self, timeout:int, myIP:str, neighbourIP:str)->None:
         '''
-        Sets the timeout value for the table entries.
+        Sets the timeout value for the table entries that came from neighbourIP.
         '''
-        self.table.setTimeout(timeout)
+        self.table.setTimeout(timeout, myIP, neighbourIP)
     
-    def setGarbage(self, garbage:int)->None:
+    def setGarbage(self, garbage:int, myIP:str, neighbourIP:str)->None:
         '''
-        Sets the garbage value for the table entries.
+        Sets the garbage value for the table entries that came from neighbourIP.
         '''
-        self.table.setGarbage(garbage)
+        self.table.setGarbage(garbage, myIP, neighbourIP)
+    
+    
+    def setMetric(self, metric:int, myIP:str, neighbourIP:str)->None:
+        '''
+        Updates the metric value for the table entries that came from neighbourIP.
+        '''
+        self.table.setMetric(metric, myIP, neighbourIP)
     
     def setUpdate(self,update:int)->None:
         '''
@@ -556,6 +600,10 @@ class Router:
 def main():
     try:
         IPSubnetList = []
+        timeoutVals = dict()
+        metric = dict()
+        garbage = dict()
+        
         ID = environ['ID']
         
         path = f'/home/tc/pr/cfg/r{ID}'
@@ -565,18 +613,25 @@ def main():
             lines = file.readlines()
             IPSubnetList.append((lines[2][3:-1],lines[3][7:-1]))
             
+            timeoutVals[IPSubnetList[-1][0]] = int(lines[4].split('=')[1])
+            metric[IPSubnetList[-1][0]] = int(lines[5].split('=')[1])
+            garbage[IPSubnetList[-1][0]] = int(lines[6].split('=')[1])
+            
         
-        R = Router(IPSubnetList)
+        
+        R = Router(IPSubnetList, timeoutVals, metric,garbage)
         R.start()
     except KeyboardInterrupt:
         try:
-            R.shutdown()
+            pass
+            #R.shutdown()
         except BaseException as e:
             logger.error(format_exc())
     except BaseException as e:
         logger.error(format_exc())
         try:
-            R.shutdown()
+            pass
+            #R.shutdown()
         except BaseException as e:
             logger.error(format_exc())
             exit(0)
