@@ -10,23 +10,19 @@ class Versions:
     V2 = 2
 
 class RIPEntry:
-    def __init__(self, AF_id=socket.AF_INET, ip='0.0.0.0', subnet='0.0.0.0', nextHop='0.0.0.0', metric=0, routeTag=0):
-        self.AF_id = AF_id
-        self.ip = ip
-        self.subnet = subnet
-        self.nextHop = nextHop
-        self.metric = metric
-        self.routeTag = routeTag
+    def __init__(self, AF_id=socket.AF_INET, ip='0.0.0.0', subnet='0.0.0.0', nextHop='0.0.0.0', metric=0, routeTag=0, other=None):
+        if other is not None:
+            self.copy(other)
+        else:
+            self.AF_id = AF_id
+            self.ip = ip
+            self.subnet = subnet
+            self.nextHop = nextHop
+            self.metric = metric
+            self.routeTag = routeTag
     
-    def generateFrom(self, entry):
-        self.AF_id = entry.AF_id
-        self.ip = entry.ip
-        self.subnet = entry.subnet
-        self.nextHop = entry.nextHop
-        self.metric = entry.metric
-        self.routeTag = entry.routeTag
-    def clone(self):
-        return RIPEntry(self.getAF_id(), self.getIP(), self.getSubnet(), self.getNextHop(), self.getMetric(), self.getRT())
+    
+    
     def getAF_id(self):
         return self.AF_id
     def setAF_id(self, id):
@@ -65,13 +61,24 @@ class RIPEntry:
                 self.metric == other.metric and 
                 self.routeTag == other.routeTag)
     
+    def copy(self, other):
+        self.setAF_id(other.getAF_id())
+        self.setIP(other.getIP())
+        self.setMetric(other.getMetric())
+        self.setNextHop(other.getNextHop())
+        self.setRT(other.getRT())
+        self.setSubnet(other.getSubnet())
+    
     def __hash__(self):
         return hash((self.AF_id, self.ip, self.subnet, self.nextHop, self.metric,self.routeTag))
 
     def __str__(self):
         return f'AF_id: {self.AF_id}\n'+f'IP: {self.ip}\n'+f'Subnet: {self.subnet}\n'+f'NextHop: {self.nextHop}\n'+f'Metric: {self.metric}\n'+f'Route Tag: {self.routeTag}'
 
-def RIPtoBytes(RIPent:RIPEntry):
+def RIPtoBytes(RIPent:RIPEntry)->bytes:
+    '''
+    Converts a RIP entry to bytes.
+    '''
     arr =[]
     arr.append(struct.pack('!2H', RIPent.getAF_id(), RIPent.getRT()))
 
@@ -82,8 +89,10 @@ def RIPtoBytes(RIPent:RIPEntry):
     arr.append(struct.pack('!I', RIPent.getMetric()))
     return b''.join(arr)
     
-def bytesToRIP(bytes : bytes):
-
+def bytesToRIP(bytes : bytes)->RIPEntry:
+    '''
+    Converts bytes to a RIP entry.
+    '''
     unpacked_data = struct.unpack('!2H4I', bytes)
     address_family_identifier = unpacked_data[0]
     route_tag = unpacked_data[1]
@@ -92,6 +101,5 @@ def bytesToRIP(bytes : bytes):
     next_hop = socket.inet_ntoa(unpacked_data[4].to_bytes(4,'big')) 
     metric = unpacked_data[5]
     return RIPEntry(AF_id=address_family_identifier, ip= ipv4, subnet= subnet, nextHop= next_hop, metric = metric, routeTag= route_tag)
-
 
 

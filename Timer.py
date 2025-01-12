@@ -1,18 +1,24 @@
 
 from time import time
+from random import randint
 
 class Timer:
     '''
     Clasa Timer RIPV2
     '''
-    def __init__(self, timeout):
+    def __init__(self, timeout=0):
         '''
         timeout - s
         '''
         self.timeout = timeout
         self.timer = -1
+        self.baseTimeout = timeout
     
-
+    def setTimeout(self, newVal):
+        self.timeout = newVal
+        
+    def setBaseTimeout(self, newVal):
+        self.baseTimeout = newVal
         
     def getTimer(self):
         return self.timer
@@ -31,13 +37,22 @@ class Timer:
             return True
         return False
     
-    def isRunning(self):
-        return not (self.timer == -1)
-    
-    def setTimeout(self, timeout):
-        self.timeout = timeout
-    def reset(self):
-        if self.timer != -1:
+    def isWorking(self):
+        return not self.timer == -1
+        
+    def reset(self, random=False, val=5):
+        if self.timer == -1:
+            return
+        if random == False:
+            self.timer = time()
+        
+        if random == True:
+            original = self.baseTimeout
+            i = randint(0,1)
+            if i%2 == 0:
+                self.setTimeout(original+randint(0,val))
+            else:
+                self.setTimeout(original-randint(0,val))
             self.timer = time()
 
     
