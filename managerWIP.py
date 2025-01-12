@@ -153,8 +153,8 @@ class SharedTable:
             else:
                 logger.debug(f'New route to {key}.')
                 self.entries[key] = self.objectManager.RIPEntry(other=entry)
-                self.timeout[key]=self.objectManager.Timer(self.timeout[myIP])
-                self.garbage[key]=self.objectManager.Timer(self.garbage[myIP])
+                self.timeout[key]=self.objectManager.Timer(self.timeoutVals[myIP])
+                self.garbage[key]=self.objectManager.Timer(self.garbageVals[myIP])
                 self.flags[key] = Flags.CHANGED
                 self.timeout[key].activate()
                 self.triggerUpdate()
