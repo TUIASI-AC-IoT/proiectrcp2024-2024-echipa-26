@@ -6,19 +6,31 @@ class Timer:
     '''
     Clasa Timer RIPV2
     '''
-    def __init__(self, timeout=0):
+    def __init__(self, timeout=0, other=None):
         '''
         timeout - s
         '''
+        
+        if other is not None:
+            self.timeout = other.getTimeout()
+            self.timer = other.getTimer()
+            self.baseTimeout =other.getBaseTimeout()
+            return
+            
         self.timeout = timeout
         self.timer = -1
         self.baseTimeout = timeout
+    
+    def getTimeout(self):
+        return self.timeout
     
     def setTimeout(self, newVal):
         self.timeout = newVal
         
     def setBaseTimeout(self, newVal):
         self.baseTimeout = newVal
+    def getBaseTimeout(self):
+        return self.baseTimeout
         
     def getTimer(self):
         return self.timer

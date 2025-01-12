@@ -3,6 +3,8 @@ from curses import wrapper
 from curses.textpad import Textbox, rectangle
 import time
 
+from Timer import Timer
+from managerWIP import Router, Flags
 # o sa mai fac curat
 
 def startSettings():
@@ -27,7 +29,7 @@ def endSettings(stdscr):
     stdscr.keypad(False)
     curses.echo()
 
-def searchAndBrowse(stdscr, G_B, Y_B, M, middle_x, middle_y):
+def searchAndBrowse(stdscr, G_B, Y_B, M, middle_x, middle_y, router:Router):
     stdscr.clear()
     curses.curs_set(0)
     curses.start_color()
@@ -77,21 +79,20 @@ def searchAndBrowse(stdscr, G_B, Y_B, M, middle_x, middle_y):
             if rectangles[current_index]["name"] == "search":
                 stdscr.attroff(curses.color_pair(1))
                 stdscr.attroff(curses.color_pair(2))
-                search(stdscr, G_B, Y_B, M, middle_x, middle_y) 
+                search(stdscr, G_B, Y_B, M, middle_x, middle_y, router) 
             elif rectangles[current_index]["name"] == "commands":
                 stdscr.attroff(curses.color_pair(1))
                 stdscr.attroff(curses.color_pair(2))
-                modify(stdscr, middle_x, middle_y)
+                modify(stdscr, middle_x, middle_y, router)
             elif rectangles[current_index]["name"] == "browse":
-                browse(stdscr, G_B, Y_B, M, middle_x, middle_y)
+                browse(stdscr, G_B, Y_B, M, middle_x, middle_y, router)
             stdscr.refresh()
             stdscr.getch()
         elif key == ord('q'):  
             endSettings(stdscr)
             break
 
-
-def modify(stdscr, middle_x, middle_y):
+def modify(stdscr, middle_x, middle_y, router):
     stdscr.clear()
     curses.curs_set(1)
 
@@ -123,6 +124,10 @@ def modify(stdscr, middle_x, middle_y):
 
         text = cutie.gather().strip()
 
+        #text = comanda introdusa
+        #in text_buffer se baga textul output
+        
+        
         if text.lower() == "quit":
             curses.curs_set(0)
             break
@@ -158,7 +163,7 @@ def modify(stdscr, middle_x, middle_y):
         stdscr.refresh()
         modify_win.refresh()
 
-def search(stdscr, G_B, Y_B, M, middle_x, middle_y):
+def search(stdscr, G_B, Y_B, M, middle_x, middle_y, router):
     curses.curs_set(0)  
     stdscr.clear()
 
@@ -314,7 +319,6 @@ def window_text(window, G_B):
     window.addstr(7,2, '> Garbage : ', curses.A_BOLD | G_B)
     window.addstr(8,2, '> Flags : ', curses.A_BOLD | G_B)
 
-
 def parseText():
     
     af = []
@@ -349,14 +353,14 @@ def parseText():
         "Route Tag": routeTag
     }
           
-def browse(stdscr, G_B, Y_B, M, middle_x, middle_y):
+def browse(stdscr, G_B, Y_B, M, middle_x, middle_y, router:Router):
     curses.curs_set(0)
     stdscr.clear()
     curses.start_color()
     curses.init_pair(8, curses.COLOR_BLACK, curses.COLOR_WHITE)  
     curses.init_pair(11, curses.COLOR_CYAN, curses.COLOR_BLACK)
     C = curses.color_pair(11)
-    parsed_data = parseText()
+    
 
     winArr = []
 
@@ -368,8 +372,37 @@ def browse(stdscr, G_B, Y_B, M, middle_x, middle_y):
     winArr.append(win3)
     win4 = curses.newwin(10, 38, 14, 41)
     winArr.append(win4)
-
-    total_data = len(parsed_data["AF_id"])
+    
+    
+    parsed_data = dict()
+    
+    parsed_data["AF_id"]=list()
+    parsed_data["IP"]=list()
+    parsed_data["Metric"]=list()
+    parsed_data["NextHop"]=list()
+    parsed_data["Route Tag"] = list()
+    parsed_data["Subnet"]=list()
+    
+    
+    
+    
+    entries = router.table.getAllEntries()
+    
+    
+    for entry in entries:
+        parsed_data["AF_id"].append(entry.getAF_id())
+        parsed_data["IP"].append(entry.getIP())
+        parsed_data["Metric"].append(entry.getMetric())
+        parsed_data["NextHop"].append(entry.getNextHop())
+        parsed_data["Route Tag"].append(entry.getRT())
+        parsed_data["Subnet"].append(entry.getSubnet())
+        
+    
+    total_data = len(entries)
+    
+        
+    
+    
     active_window = 0  
     cols = 2
     rows = 2
@@ -415,7 +448,55 @@ def browse(stdscr, G_B, Y_B, M, middle_x, middle_y):
 
     stdscr.addstr(0, 37, "BROWSE", curses.A_BOLD | curses.A_REVERSE | Y_B)
 
+
+    updateVals = Timer(10)
+    updateVals.activate()
     while True:
+        
+        if updateVals.tick():
+            updateVals.reset()
+            entries = router.table.getAllEntries()
+            for entry in entries:
+                parsed_data["AF_id"].append(entry.getAF_id())
+                parsed_data["IP"].append(entry.getIP())
+                parsed_data["Metric"].append(entry.getMetric())
+                parsed_data["NextHop"].append(entry.getNextHop())
+                parsed_data["Route Tag"].append(entry.getRT())
+                parsed_data["Subnet"].append(entry.getSubnet())
+                
+            total_data = len(entries)
+            
+        
+        timeouts = router.table.getAllTimeouts()
+        garbage =router.table.getAllGarbage()
+        flags = router.table.getAllFlags()
+        parsed_data["Timeout"]=list()
+        parsed_data["Garbage"]=list()
+        parsed_data["Flag"] = list()
+        for entry in entries:
+            val1 = timeouts[entry.getIP()]
+            
+            if val1.getTimer() == -1:
+                parsed_data["Timeout"].append("Not activated.")
+            else:
+                parsed_data["Timeout"].append(time()-val1.getTimer())
+                
+            
+            val2 = garbage[entry.getIP()]
+            
+            if val2.getTimer()==-1:
+                parsed_data["Garbage"].append("Not activated.")
+            else:
+                parsed_data["Garbage"].append(time()-val1.getTimer())
+                
+            
+            val3 = flags[entry.getIP()]
+            if val3 == Flags.UNCHANGED:
+                parsed_data["Flag"].append("Unchanged.")
+            else:
+                parsed_data["Flag"].append("Changed.")
+
+        
         draw_borders()
         key = stdscr.getch()
         if key == ord('q'):
@@ -440,10 +521,10 @@ def browse(stdscr, G_B, Y_B, M, middle_x, middle_y):
                 current_page -= 1
                 active_window = 0
                 update_windows()
+        elif key in [ord('r'), ord('R')]:
+            pass
+            
 
-def CLI(stdscr):
-    #loadingScreen(stdscr)
+def CLI(router:Router):
     stdscr, G_B, Y_B, M, middle_x, middle_y = startSettings()
-    searchAndBrowse(stdscr, G_B, Y_B, M, middle_x, middle_y)
-
-wrapper(CLI)
+    searchAndBrowse(stdscr, G_B, Y_B, M, middle_x, middle_y, router)

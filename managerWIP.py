@@ -15,6 +15,7 @@ from traceback import format_exc
 from RIPEntry import *
 from Message import *
 from Timer import *
+from CLI import CLI
 
 multicastPort = 520
 multicastIP = '224.0.0.9'
@@ -262,6 +263,28 @@ class SharedTable:
             ret.append(e)
         return ret
     
+    def getAllTimeouts(self)->Dict[Timer]:
+        ret = dict()
+        for IP in list(self.timeout.keys()):
+            t = Timer(other=self.timeout[IP])
+            ret[IP]=t
+        return ret
+    
+    def getAllGarbage(self)->Dict[Timer]:
+        ret = dict()
+        for IP in list(self.garbage.keys()):
+            g = Timer(other=self.garbage[IP])
+            ret[IP]=g
+        return ret
+    
+    
+    def getAllFlags(self)->Dict[Flags]:
+        ret = dict()
+        for IP in list(self.flags.keys()):
+            f = self.flags[IP]
+            ret[IP] = f
+        return ret
+    
     def getAllChangedEntries(self)->List[RIPEntry]:
         '''
         Returns all the entries that are changed. Beware returned entries are marked as unchanged when added to the result.
@@ -359,7 +382,6 @@ class Router:
         '''
         self.table.setGarbage(garbage, myIP, neighbourIP)
     
-    
     def setMetric(self, metric:int, myIP:str, neighbourIP:str)->None:
         '''
         Updates the metric value for the table entries that came from neighbourIP.
@@ -433,33 +455,36 @@ class Router:
         
         
         
-        print("stop=stop all the processes")
-        print("show=generate the table")
-        print("help=display this menu")
+        CLI(self)
         
         
-        while True:
-            command = input("Enter command:")
-            if command == 'stop':
-                logger.debug('Shutting down the processes.')
-                kill(self.sendProcess.pid, signal.SIGTERM)
-                kill(self.listenProcess.pid, signal.SIGTERM)
-                kill(self.timeCheckerProcess.pid, signal.SIGTERM)
-                self.shutdown()
-                break
-            elif command=="show":
-                f= open('table.txt', 'w')
-                entries = self.table.getAllEntries()
-                for e in entries:
-                    f.write(str(e))
-                    f.write('\n\n')
-                f.close()
-            elif command=="help":
-                print("stop=stop all the processes")
-                print("show=generate the table")
-                print("help=display this menu")
-            else:
-                system(command)
+        # print("stop=stop all the processes")
+        # print("show=generate the table")
+        # print("help=display this menu")
+        
+        
+        # while True:
+        #     command = input("Enter command:")
+        #     if command == 'stop':
+        #         logger.debug('Shutting down the processes.')
+        #         kill(self.sendProcess.pid, signal.SIGTERM)
+        #         kill(self.listenProcess.pid, signal.SIGTERM)
+        #         kill(self.timeCheckerProcess.pid, signal.SIGTERM)
+        #         self.shutdown()
+        #         break
+        #     elif command=="show":
+        #         f= open('table.txt', 'w')
+        #         entries = self.table.getAllEntries()
+        #         for e in entries:
+        #             f.write(str(e))
+        #             f.write('\n\n')
+        #         f.close()
+        #     elif command=="help":
+        #         print("stop=stop all the processes")
+        #         print("show=generate the table")
+        #         print("help=display this menu")
+        #     else:
+        #         system(command)
                 
         self.join()
         
