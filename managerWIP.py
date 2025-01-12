@@ -619,7 +619,7 @@ def main():
             
         
         
-        R = Router(IPSubnetList, timeoutVals, metric,garbage)
+        R = Router(IPSubnetList, timeoutVals, garbage, metric)
         R.start()
     except KeyboardInterrupt:
         try:
