@@ -1,11 +1,12 @@
 import multiprocessing
 from typing import Dict,List, Tuple
 import socket
-from os import kill, system
+from os import kill
 import struct
 import select
 from random import randint, seed
 from time import sleep, time
+from traceback import format_exc
 
 
 from define import *
@@ -86,9 +87,11 @@ class Router:
         Starts the sender, receiver, timer checker and the main process initializes the CLI.
         '''
         logger.debug('Starting processes.')
+        
         self.sendProcess.start()
         self.listenProcess.start()
         self.timeCheckerProcess.start()
+        
         self.update.activate()
         self.cli()
         
@@ -212,140 +215,150 @@ class Router:
         '''
         Listen the sockets and responds to all types of messages. Runs in a separate process.
         '''
-        def sigterm(a,b):
-            exit(0)
+        try:
+            def sigterm(a,b):
+                exit(0)
+                
+            signal.signal(signal.SIGTERM, sigterm)
             
-        signal.signal(signal.SIGTERM, sigterm)
-        
-        socketList = list(self.listenSockets.values())
-        while True:
-            ready_to_read, _,_ = select.select(socketList,[],[], 0.1)
-            for receiver in ready_to_read:
-                msg, ancdata, _, addr = receiver.recvmsg(1024,1024)
-                dest_ip = None
-                for cmsg_level, cmsg_type, cmsg_data in ancdata:
-                    if cmsg_level == socket.IPPROTO_IP and cmsg_type == IP_PKTINFO:
-                        _, spec_dst, _ = struct.unpack('I4s4s', cmsg_data[:12])
-                        dest_ip = socket.inet_ntoa(spec_dst)
-                        break
-                msg = bytesToMessage(msg)
-                
-                self.interfaceSender[dest_ip] = addr[0]
-                self.senderInterface[addr[0]] = dest_ip
-                
-                
-                if msg.command == Commands.REQUEST:
-                    logger.debug(f'New request from {addr[0]}.')
-                    pipe.send((msg, addr))
-                if msg.command == Commands.RESPONSE:
-                    logger.debug(f'New response from {addr[0]}.')
-                    self.table.answerResponse(addr, msg, self.senderInterface[addr[0]])
+            socketList = list(self.listenSockets.values())
+            while True:
+                ready_to_read, _,_ = select.select(socketList,[],[], 0.1)
+                for receiver in ready_to_read:
+                    msg, ancdata, _, addr = receiver.recvmsg(1024,1024)
+                    dest_ip = None
+                    for cmsg_level, cmsg_type, cmsg_data in ancdata:
+                        if cmsg_level == socket.IPPROTO_IP and cmsg_type == IP_PKTINFO:
+                            _, spec_dst, _ = struct.unpack('I4s4s', cmsg_data[:12])
+                            dest_ip = socket.inet_ntoa(spec_dst)
+                            break
+                    msg = bytesToMessage(msg)
+                    
+                    self.interfaceSender[dest_ip] = addr[0]
+                    self.senderInterface[addr[0]] = dest_ip
+                    
+                    
+                    if msg.command == Commands.REQUEST:
+                        logger.debug(f'New request from {addr[0]}.')
+                        pipe.send((msg, addr))
+                    if msg.command == Commands.RESPONSE:
+                        logger.debug(f'New response from {addr[0]}.')
+                        self.table.answerResponse(addr, msg, self.senderInterface[addr[0]])
+        except BaseException as e:
+            logger.error(format_exc())
+            exit(-1)
     
     def send(self, pipe)->None:
         '''
         Answer requests, triggered updates and updates. Runs in a separate process.
         '''
-        
-        def triggeredUpdate(a,b):
-            logger.debug(f'got triggered update-sendProcess {self.triggeredUpdate.getTimer()}\t{self.triggeredUpdate.getTimeout()}')
-            if self.triggeredUpdate.isWorking() and self.triggeredUpdate.tick():
+        try:
+            def triggeredUpdate(a,b):
+                logger.debug(f'got triggered update-sendProcess {self.triggeredUpdate.getTimer()}\t{self.triggeredUpdate.getTimeout()}')
+                if self.triggeredUpdate.isWorking() and self.triggeredUpdate.tick():
+                    
+                    changed = self.table.getAllChangedEntries()
+                    
+                    logger.debug('Triggered update.')
+                    
+                    for s in list(self.sendSockets.values()):
+                        myIP = s.getsockname()[0]
+                        splitHorizon = []
+                        
+                        if myIP not in list(self.interfaceSender.keys()):
+                            continue
+                        
+                        for entry in changed:
+                            if entry.getNextHop() != self.interfaceSender[myIP]:
+                                splitHorizon.append(entry)
+                        
+                        while len(splitHorizon)>0:
+                            m = Message(Commands.RESPONSE, Versions.V2, splitHorizon[:25])
+                            m = messageToBytes(m)
+                            s.sendto(m,multicast)
+                            splitHorizon = splitHorizon[25:]
+                    
+                    self.triggeredUpdate.deactivate()      
+                else:
+                    
+                    self.triggeredUpdate.setTimeout(randint(1,5))
+                    self.triggeredUpdate.activate()
                 
-                changed = self.table.getAllChangedEntries()
-                
-                logger.debug('Triggered update.')
-                
+            def update(a,b):
+                entries = self.table.getAllEntries()
+                logger.debug('Update.')
                 for s in list(self.sendSockets.values()):
                     myIP = s.getsockname()[0]
                     splitHorizon = []
                     
+                    
+                    
                     if myIP not in list(self.interfaceSender.keys()):
+                        
                         continue
                     
-                    for entry in changed:
-                        if entry.getNextHop() != self.interfaceSender[myIP]:
+                    for entry in entries:
+                        if entry.getNextHop()!=self.interfaceSender[myIP]:
                             splitHorizon.append(entry)
-                    
-                    while len(splitHorizon)>0:
+                
+                    while len(splitHorizon)>25:
                         m = Message(Commands.RESPONSE, Versions.V2, splitHorizon[:25])
                         m = messageToBytes(m)
-                        s.sendto(m,multicast)
-                        splitHorizon = splitHorizon[25:]
-                
-                self.triggeredUpdate.deactivate()      
-            else:
-                
-                self.triggeredUpdate.setTimeout(randint(1,5))
-                self.triggeredUpdate.activate()
-            
-        def update(a,b):
-            entries = self.table.getAllEntries()
-            logger.debug('Update.')
-            for s in list(self.sendSockets.values()):
-                myIP = s.getsockname()[0]
-                splitHorizon = []
-                
-                
-                
-                if myIP not in list(self.interfaceSender.keys()):
-                    
-                    continue
-                
-                for entry in entries:
-                    if entry.getNextHop()!=self.interfaceSender[myIP]:
-                        splitHorizon.append(entry)
-               
-                while len(splitHorizon)>25:
+                        s.sendto(m, multicast)
+                        print(f'sent {len(splitHorizon[:25])} to {self.interfaceSender[myIP]}')
+                        splitHorizon = splitHorizon[:25]
                     m = Message(Commands.RESPONSE, Versions.V2, splitHorizon[:25])
                     m = messageToBytes(m)
                     s.sendto(m, multicast)
-                    print(f'sent {len(splitHorizon[:25])} to {self.interfaceSender[myIP]}')
-                    splitHorizon = splitHorizon[:25]
-                m = Message(Commands.RESPONSE, Versions.V2, splitHorizon[:25])
-                m = messageToBytes(m)
-                s.sendto(m, multicast)
-                                       
-        
-        def sigterm(a,b):
-            exit(0)          
-        
-        signal.signal(signal.SIGTERM, sigterm)
-        signal.signal(TRIGGER_UPDATE_SIGNAL, triggeredUpdate)
-        signal.signal(UPDATE_SIGNAL, update)
-        
-        seed(time())
-        sleep(randint(1,10))
-        
-        for sock in list(self.sendSockets.values()):
-            null = RIPEntry(metric=INF, AF_id=0)
-            req = Message(Commands.REQUEST, Versions.V2, [null])
-            req = messageToBytes(req)
-            sock.sendto(req, multicast)
-            logger.debug(f'Sending request over the {sock.getsockname()[0]} group.')
+                                        
             
+            def sigterm(a,b):
+                exit(0)          
             
-        while True:
-            if pipe.poll(0.1):
-                req, sender = pipe.recv()
-                m = self.table.answerRequest(req)
-                m = messageToBytes(m)
-                self.sendSockets[self.senderInterface[sender[0]]].sendto(m,sender)
+            signal.signal(signal.SIGTERM, sigterm)
+            signal.signal(TRIGGER_UPDATE_SIGNAL, triggeredUpdate)
+            signal.signal(UPDATE_SIGNAL, update)
+            
+            seed(time())
+            sleep(randint(1,10))
+            
+            for sock in list(self.sendSockets.values()):
+                null = RIPEntry(metric=INF, AF_id=0)
+                req = Message(Commands.REQUEST, Versions.V2, [null])
+                req = messageToBytes(req)
+                sock.sendto(req, multicast)
+                logger.debug(f'Sending request over the {sock.getsockname()[0]} group.')
+                
+                
+            while True:
+                if pipe.poll(0.1):
+                    req, sender = pipe.recv()
+                    m = self.table.answerRequest(req)
+                    m = messageToBytes(m)
+                    self.sendSockets[self.senderInterface[sender[0]]].sendto(m,sender)
+        except BaseException as e:
+            logger.error(format_exc())
+            exit(-1)
                 
                 
     def checkTimers(self)->None:
         '''
         Method that checks the timers constantly. Runs in a separate process.
         '''
-        
-        def sigterm(a,b):
-            exit(0)
+        try:
+            def sigterm(a,b):
+                exit(0)
+                
+            signal.signal(signal.SIGTERM, sigterm)
             
-        signal.signal(signal.SIGTERM, sigterm)
-        
-        
-        
-        while True:
-            self.manageTimers()
-            sleep(0.1)
+            
+            
+            while True:
+                self.manageTimers()
+                sleep(0.1)
+        except BaseException as e:
+            logger.error(format_exc())
+            exit(-1)
             
 
 # print("stop=stop all the processes")
