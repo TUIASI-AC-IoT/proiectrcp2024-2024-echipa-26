@@ -217,6 +217,7 @@ class Router:
         '''
         try:
             def sigterm(a,b):
+                pipe.close()
                 exit(0)
                 
             signal.signal(signal.SIGTERM, sigterm)
@@ -246,6 +247,7 @@ class Router:
                         self.table.answerResponse(addr, msg, self.senderInterface[addr[0]])
         except BaseException as e:
             logger.error(format_exc())
+            pipe.close()
             exit(-1)
     
     def send(self, pipe)->None:
@@ -313,6 +315,7 @@ class Router:
                                         
             
             def sigterm(a,b):
+                pipe.close()
                 exit(0)          
             
             signal.signal(signal.SIGTERM, sigterm)
@@ -335,9 +338,11 @@ class Router:
                     req, sender = pipe.recv()
                     m = self.table.answerRequest(req)
                     m = messageToBytes(m)
-                    self.sendSockets[self.senderInterface[sender[0]]].sendto(m,sender)
+                    if sender[0] in list(self.senderInterface.keys()):
+                        self.sendSockets[self.senderInterface[sender[0]]].sendto(m,sender)
         except BaseException as e:
             logger.error(format_exc())
+            pipe.close()
             exit(-1)
                 
                 
