@@ -235,6 +235,9 @@ class Router:
                             break
                     msg = bytesToMessage(msg)
                     
+                    if dest_ip == '10.0.2.15':
+                        continue
+                    
                     self.interfaceSender[dest_ip] = addr[0]
                     self.senderInterface[addr[0]] = dest_ip
                     
