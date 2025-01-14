@@ -227,6 +227,10 @@ class Router:
                 ready_to_read, _,_ = select.select(socketList,[],[], 0.1)
                 for receiver in ready_to_read:
                     msg, ancdata, _, addr = receiver.recvmsg(1024,1024)
+                    if addr[0] == '10.0.2.15':
+                        msg = bytesToMessage(msg)
+                        logger.error(str(msg))
+                        continue
                     dest_ip = None
                     for cmsg_level, cmsg_type, cmsg_data in ancdata:
                         if cmsg_level == socket.IPPROTO_IP and cmsg_type == IP_PKTINFO:

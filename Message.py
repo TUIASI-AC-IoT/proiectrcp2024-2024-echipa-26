@@ -9,6 +9,9 @@ class Message:
         self.command = command
         self.version = version
         self.entries = RIPentries
+    
+    def __str__(self):
+        return str(self.command)+" "+str(self.version)+"\n"+str(self.entries)
             
     
 
