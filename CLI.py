@@ -171,7 +171,8 @@ def modify(stdscr, router):
                 'set/get update [newVal]-sets new val for the update timer.',
                 'q-quit this mode.',
                 'clear-clears the screen.',
-                'interfaces-displays the IP addresses.'
+                'interfaces-displays the IP addresses.',
+                'status-prints the pids of the processes.'
                 ]
     
    
@@ -206,6 +207,8 @@ def modify(stdscr, router):
             stdscr.clear()
             stdscr.refresh()
             return
+        elif text.lower()=="status":
+            addToBuffer(f'{router.listenProcess.is_alive()} {router.sendProcess.is_alive()} {router.timeCheckerProcess.is_alive()}')
         elif text.lower() == "clear":
             output_win.clear()  
             output_win.box()  
