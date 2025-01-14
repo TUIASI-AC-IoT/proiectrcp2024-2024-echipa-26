@@ -1,13 +1,7 @@
 import socket
 import struct
 
-class Commands:
-    REQUEST = 1
-    RESPONSE = 2
 
-class Versions:
-    V1 = 1
-    V2 = 2
 
 class RIPEntry:
     def __init__(self, AF_id=socket.AF_INET, ip='0.0.0.0', subnet='0.0.0.0', nextHop='0.0.0.0', metric=0, routeTag=0, other=None):
@@ -23,8 +17,8 @@ class RIPEntry:
     
     
     
-    def getAF_id(self):
-        return self.AF_id
+    def getAF_id(self)->int:
+        return int(self.AF_id)
     def setAF_id(self, id):
         self.AF_id = id
         

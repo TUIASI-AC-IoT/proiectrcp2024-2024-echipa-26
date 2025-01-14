@@ -53,6 +53,3 @@ def bytesToMessage(bytes:bytes):
 
     
     return Message(unpacked_data[0], unpacked_data[1], ripEntry)
-
-
-

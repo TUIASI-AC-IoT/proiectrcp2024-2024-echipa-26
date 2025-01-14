@@ -29,6 +29,7 @@ class Timer:
         
     def setBaseTimeout(self, newVal):
         self.baseTimeout = newVal
+        
     def getBaseTimeout(self):
         return self.baseTimeout
         
@@ -66,5 +67,3 @@ class Timer:
             else:
                 self.setTimeout(original-randint(0,val))
             self.timer = time()
-
-    
