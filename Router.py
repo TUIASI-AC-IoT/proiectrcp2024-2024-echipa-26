@@ -338,8 +338,10 @@ class Router:
                     req, sender = pipe.recv()
                     m = self.table.answerRequest(req)
                     m = messageToBytes(m)
-                    if sender[0] in list(self.senderInterface.keys()):
+                    if sender[0] in list(self.senderInterface.keys()) and self.senderInterface[sender[0]] in list(self.sendSockets.keys()):
                         self.sendSockets[self.senderInterface[sender[0]]].sendto(m,sender)
+                    else:
+                        logger.error(self.senderInterface)
         except BaseException as e:
             logger.error(format_exc())
             pipe.close()
