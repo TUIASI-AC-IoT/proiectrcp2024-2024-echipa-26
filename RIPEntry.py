@@ -61,7 +61,13 @@ class RIPEntry:
                 self.metric == other.metric and 
                 self.routeTag == other.routeTag)
     
-    
+    def copy(self, other):
+        self.AF_id = other.getAF_id()
+        self.ip = other.getIP()
+        self.subnet=other.getSubnet()
+        self.nextHop=other.getNextHop()
+        self.metric = other.getMetric()
+        self.routeTag = other.getRT()
     
     def __hash__(self):
         return hash((self.AF_id, self.ip, self.subnet, self.nextHop, self.metric,self.routeTag))
