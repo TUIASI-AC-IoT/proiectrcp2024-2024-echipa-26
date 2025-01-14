@@ -45,11 +45,7 @@ class SharedTable:
         for IP in metricVals:
             self.metricVals[IP] = metricVals[IP]
         
-        
 
-        logger.debug(timeoutVals)
-        logger.debug(garbageVals)
-        logger.debug(metricVals)
         
         
         for IP, subnet in IPSubnetList:
@@ -63,17 +59,14 @@ class SharedTable:
         Method used to answer a request.
         '''
         if len(req.entries)==0:
-            logger.debug('Request with 0 entries.')
             return Message(Commands.RESPONSE, Versions.V2, [])
         
         
         if len(req.entries)==1 and req.entries[0].AF_id==0 and req.entries[0].getMetric()==INF:
-            logger.debug('Request for the entire table.')
             toBeSent = list(self.entries.values())
             m = Message(Commands.RESPONSE, Versions.V2, toBeSent)
             return m
         
-        logger.debug('Debug request.')
         for entry in req.entries:
             pass
         
@@ -83,7 +76,6 @@ class SharedTable:
         '''
         Sends a trigger update signal to the parent process.
         '''
-        logger.debug('Shared table requested trigger update')
         kill(getppid(), TRIGGER_UPDATE_SIGNAL)
     
     def answerResponse(self, sender:Tuple[str,int], response:Message, myIP:str)->None:
@@ -121,7 +113,6 @@ class SharedTable:
                         self.garbage[key].deactivate()
                         self.triggerUpdate()
             else:
-                logger.debug(f'New route to {key}.')
                 self.entries[key] = self.objectManager.RIPEntry(other=entry)
                 self.timeout[key]=self.objectManager.Timer(self.timeoutVals[myIP])
                 self.garbage[key]=self.objectManager.Timer(self.garbageVals[myIP])
@@ -135,7 +126,6 @@ class SharedTable:
         '''
         for IP in list(self.garbage.keys()):
             if self.garbage[IP].tick():
-                logger.debug(f'Deleted the route for {IP}.')
                 del self.garbage[IP]
                 del self.timeout[IP]
                 del self.flags[IP]
@@ -147,7 +137,6 @@ class SharedTable:
         '''
         for IP in list(self.garbage.keys()):
             if self.timeout[IP].tick():
-                logger.debug(f'The route to {IP} timed out.')
                 self.entries[IP].setMetric(INF)
                 self.timeout[IP].deactivate()
                 self.garbage[IP].activate()
@@ -181,7 +170,6 @@ class SharedTable:
                 self.timeout[IP].setTimeout(newVal)
                 self.timeout[IP].setBaseTimeout(newVal)
         
-        logger.debug(f'New timeout set {newVal} for interface {myIP}')
             
     def setGarbage(self, newVal:int, myIP:str, neighbourIP:str)->None:
         
@@ -201,7 +189,6 @@ class SharedTable:
         
         
             
-        logger.debug(f'New garbage set {newVal} for interface {myIP}')
 
     def setMetric(self, newVal:int, myIP:str, neighborIP:str)->None:
         '''
@@ -217,7 +204,6 @@ class SharedTable:
             if self.entries[IP].getNextHop() == neighborIP:
                 self.entries[IP].setMetric(min(self.entries[IP].getMetric()+diffMetric, INF))
             
-        logger.debug(f'New metric set {newVal} for interface {myIP}')
 
     def getTimeout(self, myIP:str):
         return self.timeoutVals[myIP]

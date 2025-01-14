@@ -81,8 +81,7 @@ def menu(stdscr, router):
         stdscr.addstr(20, middle_x - 15, "Apasati 'q' pentru a iesi", curses.A_BLINK)
         
         key = stdscr.getch()
-        if key != -1:
-            logger.debug(f'key:{key}')
+        
         if key == curses.KEY_RIGHT:
             current_index = (current_index + 1) % len(rectangles)
         elif key == curses.KEY_LEFT:
@@ -233,7 +232,6 @@ def modify(stdscr, router):
             
             words = text.split(' ')
             
-            logger.debug(words)
             try:
                 
                 if words[0]=="set":
@@ -533,7 +531,6 @@ def browse(stdscr, router):
     winArr = []
 
 
-    logger.debug(f'{h} {w}')
     upLeftWin = curses.newwin(hWin, wWin, 1, 1)
     
     winArr.append(upLeftWin)

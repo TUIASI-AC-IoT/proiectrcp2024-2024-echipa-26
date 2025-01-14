@@ -86,7 +86,7 @@ class Router:
         '''
         Starts the sender, receiver, timer checker and the main process initializes the CLI.
         '''
-        logger.debug('Starting processes.')
+        
         
         self.sendProcess.start()
         self.listenProcess.start()
@@ -172,7 +172,6 @@ class Router:
         kill(self.timeCheckerProcess.pid, signal.SIGTERM)
         self.closeManagers()
         self.closeSockets()
-        logger.debug('Shut down.')
     
     
                 
@@ -197,7 +196,6 @@ class Router:
         CLI method. Runs in a separate process.
         '''
         def triggerUpdate(a,b):
-            logger.debug('Main received request, sending to sendProcess.')
             kill(self.sendProcess.pid, TRIGGER_UPDATE_SIGNAL)
         signal.signal(TRIGGER_UPDATE_SIGNAL, triggerUpdate)
         
@@ -243,10 +241,8 @@ class Router:
                     
                     
                     if msg.command == Commands.REQUEST:
-                        logger.debug(f'New request from {addr[0]}.')
                         pipe.send((msg, addr))
                     if msg.command == Commands.RESPONSE:
-                        logger.debug(f'New response from {addr[0]}.')
                         self.table.answerResponse(addr, msg, self.senderInterface[addr[0]])
         except BaseException as e:
             logger.error(format_exc())
@@ -259,12 +255,10 @@ class Router:
         '''
         try:
             def triggeredUpdate(a,b):
-                logger.debug(f'got triggered update-sendProcess {self.triggeredUpdate.getTimer()}\t{self.triggeredUpdate.getTimeout()}')
                 if self.triggeredUpdate.isWorking() and self.triggeredUpdate.tick():
                     
                     changed = self.table.getAllChangedEntries()
                     
-                    logger.debug('Triggered update.')
                     
                     for s in list(self.sendSockets.values()):
                         myIP = s.getsockname()[0]
@@ -291,7 +285,6 @@ class Router:
                 
             def update(a,b):
                 entries = self.table.getAllEntries()
-                logger.debug('Update.')
                 for s in list(self.sendSockets.values()):
                     myIP = s.getsockname()[0]
                     splitHorizon = []
@@ -333,7 +326,6 @@ class Router:
                 req = Message(Commands.REQUEST, Versions.V2, [null])
                 req = messageToBytes(req)
                 sock.sendto(req, multicast)
-                logger.debug(f'Sending request over the {sock.getsockname()[0]} group.')
                 
                 
             while True:
@@ -341,10 +333,9 @@ class Router:
                     req, sender = pipe.recv()
                     m = self.table.answerRequest(req)
                     m = messageToBytes(m)
-                    if sender[0] in list(self.senderInterface.keys()) and self.senderInterface[sender[0]] in list(self.sendSockets.keys()):
-                        self.sendSockets[self.senderInterface[sender[0]]].sendto(m,sender)
-                    else:
-                        logger.error(self.senderInterface)
+                    
+                    self.sendSockets[self.senderInterface[sender[0]]].sendto(m,sender)
+                    
         except BaseException as e:
             logger.error(format_exc())
             pipe.close()
