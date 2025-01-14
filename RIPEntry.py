@@ -6,14 +6,14 @@ import struct
 class RIPEntry:
     def __init__(self, AF_id=socket.AF_INET, ip='0.0.0.0', subnet='0.0.0.0', nextHop='0.0.0.0', metric=0, routeTag=0, other=None):
         if other is not None:
-            self.AF_id = other.getAF_id()
+            self.AF_id = int(other.getAF_id())
             self.ip = other.getIP()
             self.subnet=other.getSubnet()
             self.nextHop=other.getNextHop()
             self.metric = other.getMetric()
             self.routeTag = other.getRT()
         else:
-            self.AF_id = AF_id
+            self.AF_id = int(AF_id)
             self.ip = ip
             self.subnet = subnet
             self.nextHop = nextHop
@@ -24,9 +24,8 @@ class RIPEntry:
     
     def getAF_id(self)->int:
         return int(self.AF_id)
-    
     def setAF_id(self, id):
-        self.AF_id = id
+        self.AF_id = int(id)
         
     def getIP(self):
         return self.ip
