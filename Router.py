@@ -188,11 +188,11 @@ class Router:
         if self.update.tick():
             self.triggeredUpdate.deactivate()
             self.update.reset(random=True, val=5)
-            if self.sendProcess.is_alive():
-                kill(self.sendProcess.pid, UPDATE_SIGNAL)
+            
+            kill(self.sendProcess.pid, UPDATE_SIGNAL)
         elif self.triggeredUpdate.tick():
-            if self.sendProcess.is_alive():
-                kill(self.sendProcess.pid, TRIGGER_UPDATE_SIGNAL)
+            
+            kill(self.sendProcess.pid, TRIGGER_UPDATE_SIGNAL)
             
     
     
