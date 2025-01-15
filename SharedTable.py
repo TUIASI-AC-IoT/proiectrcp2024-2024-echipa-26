@@ -348,7 +348,7 @@ class SharedTable:
         for IP in IPlist:
             try:
                 self.IPLock[IP].acquire()
-                t = Timer(other=self.flags[IP])
+                t = self.flags[IP]
                 self.IPLock[IP].release()
                 ret[IP]=t
             except KeyError:
