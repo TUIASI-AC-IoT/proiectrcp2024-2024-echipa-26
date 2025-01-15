@@ -205,7 +205,7 @@ class SharedTable:
                     self.garbage[IP].activate()
                     self.flags[IP] = Flags.CHANGED
                     self.triggerUpdate()
-                self.IPLock.release()
+                self.IPLock[IP].release()
             except KeyError:
                 continue
                 
