@@ -29,8 +29,23 @@ class Router:
         Constructs the table and sockets.
         '''
     
-        MyManager.register('Timer', Timer)
-        MyManager.register('RIPEntry', RIPEntry)
+        MyManager.register('Timer', Timer, exposed=[
+                            'getTimeout','setTimeout',
+                            'setBaseTimeout', 'getBaseTimeout',
+                            'getTimer',
+                            'activate', 'deactivate',
+                            'tick', 'isWorking', 'reset'
+                            ]
+                           )
+        MyManager.register('RIPEntry', RIPEntry, exposed=[
+                                    'getAF_id', 'setAF_id', 
+                                    'getIP', 'setIP', 
+                                    'getSubnet', 'setSubnet', 
+                                    'getNextHop', 'setNextHop', 
+                                    'getMetric', 'setMetric', 
+                                    'getRT', 'setRT', 
+                                    '__eq__', 'copy', '__hash__', '__str__']
+                        )
         self.manager = multiprocessing.Manager()
         self.objectManager = MyManager()
         self.objectManager.start()
