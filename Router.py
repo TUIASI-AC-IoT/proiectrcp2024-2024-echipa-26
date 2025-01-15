@@ -187,9 +187,11 @@ class Router:
         if self.update.tick():
             self.triggeredUpdate.deactivate()
             self.update.reset(random=True, val=5)
-            kill(self.sendProcess.pid, UPDATE_SIGNAL)
+            if self.sendProcess.is_alive():
+                kill(self.sendProcess.pid, UPDATE_SIGNAL)
         elif self.triggeredUpdate.tick():
-            kill(self.sendProcess.pid, TRIGGER_UPDATE_SIGNAL)
+            if self.sendProcess.is_alive():
+                kill(self.sendProcess.pid, TRIGGER_UPDATE_SIGNAL)
             
     
     
@@ -198,7 +200,8 @@ class Router:
         CLI method. Runs in a separate process.
         '''
         def triggerUpdate(a,b):
-            kill(self.sendProcess.pid, TRIGGER_UPDATE_SIGNAL)
+            if self.sendProcess.is_alive():
+                kill(self.sendProcess.pid, TRIGGER_UPDATE_SIGNAL)
         signal.signal(TRIGGER_UPDATE_SIGNAL, triggerUpdate)
         
         CLI(self)

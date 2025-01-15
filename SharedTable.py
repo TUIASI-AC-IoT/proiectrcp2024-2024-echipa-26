@@ -1,7 +1,7 @@
 from typing import List,Tuple, Dict
 from os import kill, getppid
 import multiprocessing
-
+from traceback import format_exc
 
 
 from Message import Message
@@ -76,7 +76,10 @@ class SharedTable:
         '''
         Sends a trigger update signal to the parent process.
         '''
-        kill(getppid(), TRIGGER_UPDATE_SIGNAL)
+        try:
+            kill(getppid(), TRIGGER_UPDATE_SIGNAL)
+        except BaseException as e:
+            logger.error(format_exc())
     
     def answerResponse(self, sender:Tuple[str,int], response:Message, myIP:str)->None:
         '''
