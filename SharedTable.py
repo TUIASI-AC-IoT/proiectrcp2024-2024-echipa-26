@@ -76,9 +76,7 @@ class SharedTable:
             toBeSent = []
             for IP in ipList:
                 try:
-                    # self.IPLock[IP].acquire()
                     r = RIPEntry(other=self.entries[IP])
-                    #self.IPLock[IP].release()
                     toBeSent.append(r)
                 except KeyError:
                     continue
@@ -122,9 +120,10 @@ class SharedTable:
             
             if entry.getIP() in IPList:
                 
-                self.IPLock[key].acquire()
+                
                 
                 if self.entries[key].getNextHop() == entry.getNextHop():
+                    self.IPLock[key].acquire()
                     self.timeout[key].reset()
                     if self.entries[key].getMetric()!= entry.getMetric():
                         self.entries[key].copy(entry)
@@ -133,15 +132,18 @@ class SharedTable:
                         if self.entries[key].getMetric()==INF:
                             self.garbage[key].activate()
                             self.timeout[key].deactivate()
+                    self.IPLock[key].release()
                 else:
                     if self.entries[key].getMetric() > entry.getMetric():
+                        self.IPLock[key].acquire()
                         self.entries[key].copy(entry)
                         self.flags[key] = Flags.CHANGED
                         self.timeout[key].reset()
                         self.garbage[key].deactivate()
+                        self.IPLock[key].release()
                         self.triggerUpdate()
                 
-                self.IPLock[key].release()
+                
             else:
                 self.tableLock.acquire()
                 self.entries[key] = self.objectManager.RIPEntry(other=entry)
@@ -160,7 +162,6 @@ class SharedTable:
         IPList = []
         self.tableLock.acquire()
         IPList = list(self.garbage.keys())
-        
         self.tableLock.release()
         
         
@@ -170,9 +171,9 @@ class SharedTable:
             
             
             
-            deleted = False
+           
             if self.garbage[IP].tick():
-                self.IPLock[IP].acquire()
+                
                 self.tableLock.acquire()
                 del self.garbage[IP]
                 del self.timeout[IP]
@@ -180,7 +181,7 @@ class SharedTable:
                 del self.entries[IP]
                 del self.IPLock[IP]
                 self.tableLock.release()
-                deleted = True
+                
             
             
             
@@ -192,7 +193,6 @@ class SharedTable:
         IPList = []
         self.tableLock.acquire()
         IPList = list(self.garbage.keys())
-        
         self.tableLock.release()
         
         for IP in IPList:
@@ -293,10 +293,7 @@ class SharedTable:
         ret = []
         for IP in IPlist:
             try:
-                
-                #self.IPLock[IP].acquire()
                 e = RIPEntry(other=self.entries[IP])
-                #self.IPLock[IP].release()
                 ret.append(e)
             except KeyError:
                 continue
@@ -313,9 +310,9 @@ class SharedTable:
         ret = dict()
         for IP in IPlist:
             try:
-                #self.IPLock[IP].acquire()
+                
                 t = Timer(other=self.timeout[IP])
-                #self.IPLock[IP].release()
+                
                 ret[IP]=t
             except KeyError:
                 continue
@@ -369,12 +366,11 @@ class SharedTable:
         ret = []
         for IP in IPlist:
             try:
-                #self.IPLock[IP].acquire()
+                
                 if self.flags[IP] == Flags.CHANGED:
                     e = RIPEntry(other=self.entries[IP])
                     ret.append(e)
                     self.flags[IP] = Flags.UNCHANGED
-                #self.IPLock[IP].release()
             except KeyError:
                 continue
        
