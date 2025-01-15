@@ -266,6 +266,7 @@ class Router:
                         pipe.send((msg, addr))
                     if msg.command == Commands.RESPONSE:
                         self.table.answerResponse(addr, msg, self.senderInterface[addr[0]])
+                        logger.debug(f'Ans response from {addr}, {len(msg.entries)} entries.')
         except BaseException as e:
             logger.error(format_exc())
             pipe.close()
@@ -295,12 +296,14 @@ class Router:
                         
                         while len(splitHorizon)>25:
                             m = Message(Commands.RESPONSE, Versions.V2, splitHorizon[:25])
-                            m = messageToBytes(m)
-                            s.sendto(m,multicast)
+                            b = messageToBytes(m)
+                            s.sendto(b,multicast)
+                            logger.debug(f'Trigger update using socket {myIP}. Sent {len(m.entries)}. Receiver should be: {self.interfaceSender[myIP]}')
                             splitHorizon = splitHorizon[25:]
                         m = Message(Commands.RESPONSE, Versions.V2, splitHorizon[:25])
-                        m = messageToBytes(m)
-                        s.sendto(m, multicast)
+                        b = messageToBytes(m)
+                        s.sendto(b, multicast)
+                        logger.debug(f'Trigger update using socket {myIP}. Sent {len(m.entries)}. Receiver should be: {self.interfaceSender[myIP]}')
                             
                     
                     self.triggeredUpdate.deactivate()      
@@ -330,9 +333,12 @@ class Router:
                         m = messageToBytes(m)
                         s.sendto(m, multicast)
                         splitHorizon = splitHorizon[:25]
+                        logger.debug(f'Update using socket {myIP}. Sent {len(m.entries)}. Receiver should be: {self.interfaceSender[myIP]}')
                     m = Message(Commands.RESPONSE, Versions.V2, splitHorizon[:25])
-                    m = messageToBytes(m)
-                    s.sendto(m, multicast)
+                    b = messageToBytes(m)
+                    s.sendto(b, multicast)
+                    logger.debug(f'Update using socket {myIP}. Sent {len(m.entries)}. Receiver should be: {self.interfaceSender[myIP]}')
+
                                         
             
             def sigterm(a,b):
@@ -357,8 +363,9 @@ class Router:
                 if pipe.poll(0.1):
                     req, sender = pipe.recv()
                     m = self.table.answerRequest(req)
-                    m = messageToBytes(m)
-                    self.sendSockets[self.senderInterface[sender[0]]].sendto(m,sender)
+                    b = messageToBytes(m)
+                    logger.debug(f'Sent {len(m.entries)} entries as a response to a request from {sender}.')
+                    self.sendSockets[self.senderInterface[sender[0]]].sendto(b,sender)
                     
         except BaseException as e:
             logger.error(format_exc())
