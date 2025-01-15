@@ -255,7 +255,8 @@ class Router:
                     msg = bytesToMessage(msg)
                     
                     if dest_ip == '10.0.2.15':
-                        logger.error(msg)
+                        for i in msg.entries:
+                            logger.error(str(i))
                         continue
                     
                     self.interfaceSender[dest_ip] = addr[0]
@@ -293,11 +294,14 @@ class Router:
                             if entry.getNextHop() != self.interfaceSender[myIP]:
                                 splitHorizon.append(entry)
                         
-                        while len(splitHorizon)>0:
+                        while len(splitHorizon)>25:
                             m = Message(Commands.RESPONSE, Versions.V2, splitHorizon[:25])
                             m = messageToBytes(m)
                             s.sendto(m,multicast)
                             splitHorizon = splitHorizon[25:]
+                        m = Message(Commands.RESPONSE, Versions.V2, splitHorizon[:25])
+                        m = messageToBytes(m)
+                        s.sendto(m, multicast)
                             
                     
                     self.triggeredUpdate.deactivate()      
@@ -326,7 +330,6 @@ class Router:
                         m = Message(Commands.RESPONSE, Versions.V2, splitHorizon[:25])
                         m = messageToBytes(m)
                         s.sendto(m, multicast)
-                        print(f'sent {len(splitHorizon[:25])} to {self.interfaceSender[myIP]}')
                         splitHorizon = splitHorizon[:25]
                     m = Message(Commands.RESPONSE, Versions.V2, splitHorizon[:25])
                     m = messageToBytes(m)
