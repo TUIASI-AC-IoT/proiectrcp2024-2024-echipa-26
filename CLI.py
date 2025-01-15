@@ -608,16 +608,20 @@ def browse(stdscr, router):
     
     stdscr.refresh()
     draw()
-    refresh = Timer(1)
-    refresh.activate()
+    refreshData = Timer(5)
+    refreshData.activate()
     
     
-    
+    refreshDraw = Timer(0.1)
+    refreshDraw.activate()
     
     while True:
         
-        if refresh.tick():
-            nextUpdate = Timer(other=router.update)
+        if refreshDraw.tick():
+            draw()
+            refreshDraw.reset()
+        
+        if refreshData.tick():
             entries = router.table.getAllEntries()
             timeoutDict = router.table.getAllTimeout()
             garbageDict = router.table.getAllGarbage()
@@ -637,8 +641,7 @@ def browse(stdscr, router):
                 upRight = False
                 downLeft = False
                 downRight = True
-            draw()
-            refresh.reset()
+            refreshData.reset()
         
 
         
