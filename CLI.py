@@ -648,6 +648,8 @@ def browse(stdscr, router):
             stdscr.clear()
             stdscr.refresh()
             return
+        elif key == ord('r'):
+            continue
         elif key == curses.KEY_RIGHT: 
              
             if upLeft:
