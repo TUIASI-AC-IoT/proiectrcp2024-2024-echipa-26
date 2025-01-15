@@ -2,6 +2,7 @@ import multiprocessing
 from typing import Dict,List, Tuple
 import socket
 from os import kill
+import sys
 import struct
 import select
 from random import randint, seed
@@ -221,7 +222,7 @@ class Router:
         try:
             def sigterm(a,b):
                 pipe.close()
-                exit(0)
+                sys.exit(0)
                 
             signal.signal(signal.SIGTERM, sigterm)
             
@@ -252,7 +253,7 @@ class Router:
         except BaseException as e:
             logger.error(format_exc())
             pipe.close()
-            exit(-1)
+            sys.exit(-1)
     
     def send(self, pipe)->None:
         '''
@@ -317,7 +318,7 @@ class Router:
             
             def sigterm(a,b):
                 pipe.close()
-                exit(0)          
+                sys.exit(0)          
             
             signal.signal(signal.SIGTERM, sigterm)
             signal.signal(TRIGGER_UPDATE_SIGNAL, triggeredUpdate)
@@ -344,7 +345,7 @@ class Router:
         except BaseException as e:
             logger.error(format_exc())
             pipe.close()
-            exit(-1)
+            sys.exit(-1)
                 
                 
     def checkTimers(self)->None:
@@ -353,7 +354,7 @@ class Router:
         '''
         try:
             def sigterm(a,b):
-                exit(0)
+                sys.exit(0)
                 
             signal.signal(signal.SIGTERM, sigterm)
             
@@ -364,7 +365,7 @@ class Router:
                 sleep(0.1)
         except BaseException as e:
             logger.error(format_exc())
-            exit(-1)
+            sys.exit(-1)
             
 
 # print("stop=stop all the processes")
