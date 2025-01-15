@@ -166,10 +166,12 @@ class Router:
         '''
         Shuts down the managers and sockets.
         '''
-        
-        kill(self.sendProcess.pid, signal.SIGTERM)
-        kill(self.listenProcess.pid, signal.SIGTERM)
-        kill(self.timeCheckerProcess.pid, signal.SIGTERM)
+        if self.sendProcess.is_alive():
+            kill(self.sendProcess.pid, signal.SIGTERM)
+        if self.listenProcess.is_alive():
+            kill(self.listenProcess.pid, signal.SIGTERM)
+        if self.timeCheckerProcess.is_alive():
+            kill(self.timeCheckerProcess.pid, signal.SIGTERM)
         self.closeManagers()
         self.closeSockets()
     
