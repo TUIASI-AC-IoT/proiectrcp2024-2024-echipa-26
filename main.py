@@ -29,9 +29,9 @@ def main():
             metric[IPSubnetList[-1][0]] = int(lines[5].split('=')[1])
             garbage[IPSubnetList[-1][0]] = int(lines[6].split('=')[1])
             
-        print(ID)
-        print(IPSubnetList)
-        return
+        logger.debug(ID)
+        logger.debug(IPSubnetList)
+        
         
         R = Router(IPSubnetList, timeoutVals, garbage, metric)
         R.start()
