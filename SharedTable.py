@@ -27,7 +27,11 @@ class SharedTable:
         self.objectManager = MyManager()
         self.objectManager.start()
         
-        self.managerLock = self.manager.Lock()
+        
+        self.tableLock = self.manager.Lock()
+        
+        
+        self.IPLock = self.manager.dict()
         
         self.entries = self.manager.dict()
         self.flags = self.manager.dict()
@@ -54,6 +58,7 @@ class SharedTable:
             self.timeout[IP] = self.objectManager.Timer(self.timeoutVals[IP])
             self.garbage[IP] = self.objectManager.Timer(self.garbageVals[IP])
             self.flags[IP] = Flags.UNCHANGED
+            self.IPLock[IP] = self.manager.Lock()
             
     def answerRequest(self, req:Message)->Message:
         '''
@@ -64,7 +69,19 @@ class SharedTable:
         
         
         if len(req.entries)==1 and req.entries[0].AF_id==0 and req.entries[0].getMetric()==INF:
-            toBeSent = list(self.entries.values())
+            self.tableLock.acquire()
+            ipList = list(self.entries.keys())
+            self.tableLock.release()
+            
+            toBeSent = []
+            for IP in ipList:
+                try:
+                    self.IPLock[IP].acquire()
+                    r = RIPEntry(other=self.entries[IP])
+                    self.IPLock[IP].release()
+                    toBeSent.append(r)
+                except KeyError:
+                    continue
             m = Message(Commands.RESPONSE, Versions.V2, toBeSent)
             return m
         
@@ -98,7 +115,14 @@ class SharedTable:
             entry.setMetric((int(min(entry.getMetric()+self.metricVals[myIP], INF))))
             entry.setNextHop(sender[0])
             key = entry.getIP()
-            if entry.getIP() in list(self.entries.keys()):
+            IPList = []
+            self.tableLock.acquire()
+            IPList=list(self.entries.keys())
+            self.tableLock.release()
+            
+            if entry.getIP() in IPList:
+                
+                self.IPLock[key].acquire()
                 
                 if self.entries[key].getNextHop() == entry.getNextHop():
                     self.timeout[key].reset()
@@ -116,36 +140,74 @@ class SharedTable:
                         self.timeout[key].reset()
                         self.garbage[key].deactivate()
                         self.triggerUpdate()
+                
+                self.IPLock[key].release()
             else:
+                self.tableLock.acquire()
                 self.entries[key] = self.objectManager.RIPEntry(other=entry)
                 self.timeout[key]=self.objectManager.Timer(self.timeoutVals[myIP])
                 self.garbage[key]=self.objectManager.Timer(self.garbageVals[myIP])
                 self.flags[key] = Flags.CHANGED
+                self.IPLock[key] = self.manager.Lock()
                 self.timeout[key].activate()
                 self.triggerUpdate()
+                self.tableLock.release()
                 
     def checkGarbage(self)->None:
         '''
         Method used for checking the garbage timers and deleting expired routes.
         '''
-        for IP in list(self.garbage.keys()):
+        IPList = []
+        self.tableLock.acquire()
+        IPList = list(self.garbage.keys())
+        
+        self.tableLock.release()
+        
+        
+        
+        
+        for IP in IPList:
+            
+            
+            self.IPLock[IP].acquire()
+            deleted = False
             if self.garbage[IP].tick():
+                self.tableLock.acquire()
                 del self.garbage[IP]
                 del self.timeout[IP]
                 del self.flags[IP]
                 del self.entries[IP]
+                del self.IPLock[IP]
+                self.tableLock.release()
+                deleted = True
+            
+            if not deleted:
+                self.IPLock[IP].release()
+            
                 
     def checkTimeout(self)->None:
         '''
         Method used for checking the timeout timers.
         '''
-        for IP in list(self.garbage.keys()):
-            if self.timeout[IP].tick():
-                self.entries[IP].setMetric(INF)
-                self.timeout[IP].deactivate()
-                self.garbage[IP].activate()
-                self.flags[IP] = Flags.CHANGED
-                self.triggerUpdate()
+        IPList = []
+        self.tableLock.acquire()
+        IPList = list(self.garbage.keys())
+        
+        self.tableLock.release()
+        
+        for IP in IPList:
+            try:
+                self.IPLock[IP].acquire()
+                
+                if self.timeout[IP].tick():
+                    self.entries[IP].setMetric(INF)
+                    self.timeout[IP].deactivate()
+                    self.garbage[IP].activate()
+                    self.flags[IP] = Flags.CHANGED
+                    self.triggerUpdate()
+                self.IPLock.release()
+            except KeyError:
+                continue
                 
     def cleanup(self)->None:
         '''
@@ -222,44 +284,73 @@ class SharedTable:
         '''
         Returns a list of all the entries in the table.
         '''
-        self.managerLock.acquire()
+        IPlist =[]
+        self.tableLock.acquire()
+        IPlist = list(self.entries.keys())
+        self.tableLock.release()
+        
         ret = []
-        for IP in list(self.entries.keys()):
+        for IP in IPlist:
             try:
+                
+                self.IPLock[IP].acquire()
                 e = RIPEntry(other=self.entries[IP])
+                self.IPLock[IP].release()
                 ret.append(e)
             except KeyError:
                 continue
-        self.managerLock.release()
+        
         return ret
     
     def getAllTimeout(self)->Dict[str,Timer]:
+        
+        IPlist =[]
+        self.tableLock.acquire()
+        IPlist = list(self.entries.keys())
+        self.tableLock.release()
+        
         ret = dict()
-        for IP in list(self.timeout.keys()):
+        for IP in IPlist:
             try:
+                self.IPLock[IP].acquire()
                 t = Timer(other=self.timeout[IP])
+                self.IPLock[IP].release()
                 ret[IP]=t
             except KeyError:
                 continue
         return ret
     
     def getAllGarbage(self)->Dict[str,Timer]:
+        IPlist =[]
+        self.tableLock.acquire()
+        IPlist = list(self.entries.keys())
+        self.tableLock.release()
+        
         ret = dict()
-        for IP in list(self.garbage.keys()):
+        for IP in IPlist:
             try:
-                g = Timer(other=self.garbage[IP])
-                ret[IP]=g
+                self.IPLock[IP].acquire()
+                t = Timer(other=self.garbage[IP])
+                self.IPLock[IP].release()
+                ret[IP]=t
             except KeyError:
                 continue
         return ret
     
     
     def getAllFlag(self)->Dict[str,Flags]:
+        IPlist =[]
+        self.tableLock.acquire()
+        IPlist = list(self.entries.keys())
+        self.tableLock.release()
+        
         ret = dict()
-        for IP in list(self.flags.keys()):
+        for IP in IPlist:
             try:
-                f = self.flags[IP]
-                ret[IP] = f
+                self.IPLock[IP].acquire()
+                t = Timer(other=self.flags[IP])
+                self.IPLock[IP].release()
+                ret[IP]=t
             except KeyError:
                 continue
         return ret
@@ -268,15 +359,22 @@ class SharedTable:
         '''
         Returns all the entries that are changed. Beware returned entries are marked as unchanged when added to the result.
         '''
-        self.managerLock.acquire()
+        
+        IPlist =[]
+        self.tableLock.acquire()
+        IPlist = list(self.entries.keys())
+        self.tableLock.release()
+        
         ret = []
-        for IP in list(self.entries.keys()):
+        for IP in IPlist:
             try:
+                self.IPLock[IP].acquire()
                 if self.flags[IP] == Flags.CHANGED:
                     e = RIPEntry(other=self.entries[IP])
                     ret.append(e)
                     self.flags[IP] = Flags.UNCHANGED
+                self.IPLock[IP].release()
             except KeyError:
                 continue
-        self.managerLock.release()
+       
         return ret
