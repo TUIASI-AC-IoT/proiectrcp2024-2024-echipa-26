@@ -256,8 +256,6 @@ class Router:
                     msg = bytesToMessage(msg)
                     
                     if dest_ip == '10.0.2.15':
-                        for i in msg.entries:
-                            logger.error(str(i))
                         continue
                     
                     self.interfaceSender[dest_ip] = addr[0]
