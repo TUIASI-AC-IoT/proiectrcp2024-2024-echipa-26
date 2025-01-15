@@ -195,13 +195,15 @@ class SharedTable:
         self.tableLock.acquire()
         IPList = list(self.timeout.keys())
         self.tableLock.release()
-        released = False
+        released = True
         for IP in IPList:
             try:
                 
                 
                 if self.timeout[IP].tick():
+                    
                     self.IPLock[IP].acquire()
+                    released = False
                     self.entries[IP].setMetric(INF)
                     self.timeout[IP].deactivate()
                     self.garbage[IP].activate()
