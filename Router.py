@@ -81,7 +81,7 @@ class Router:
             mreq = struct.pack("4s4s", socket.inet_aton(multicastIP), socket.inet_aton(IP))
             sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
             sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(IP))
-            sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
+            sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
             sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
             sock.setsockopt(socket.IPPROTO_IP, IP_PKTINFO, 1)
             self.listenSockets[IP] = sock
@@ -93,7 +93,7 @@ class Router:
             mreq = struct.pack("4s4s", socket.inet_aton(multicastIP), socket.inet_aton(IP))
             multicastReceiver.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
             multicastReceiver.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(IP))
-            multicastReceiver.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)
+            multicastReceiver.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
             multicastReceiver.setsockopt(socket.IPPROTO_IP, IP_PKTINFO, 1)
             multicastReceiver.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_LOOP, 0)
             
