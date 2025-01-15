@@ -107,7 +107,7 @@ class SharedTable:
                 continue
             
             if entry.getMetric()<0 or entry.getMetric()>INF:
-                logger.erro(f'Entry with wrong metric: {entry.getMetric()}.')
+                logger.error(f'Entry with wrong metric: {entry.getMetric()}.')
                 continue
             
             entry.setMetric((int(min(entry.getMetric()+self.metricVals[myIP], INF))))

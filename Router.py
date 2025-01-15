@@ -255,6 +255,7 @@ class Router:
                     msg = bytesToMessage(msg)
                     
                     if dest_ip == '10.0.2.15':
+                        logger.error(msg)
                         continue
                     
                     self.interfaceSender[dest_ip] = addr[0]
@@ -297,6 +298,7 @@ class Router:
                             m = messageToBytes(m)
                             s.sendto(m,multicast)
                             splitHorizon = splitHorizon[25:]
+                            
                     
                     self.triggeredUpdate.deactivate()      
                 else:
@@ -313,7 +315,7 @@ class Router:
                     
                     
                     if myIP not in list(self.interfaceSender.keys()):
-                        
+                        logger.debug(f'Could not find {myIP} in {list(self.interfaceSender.keys())}')
                         continue
                     
                     for entry in entries:
@@ -354,7 +356,6 @@ class Router:
                     req, sender = pipe.recv()
                     m = self.table.answerRequest(req)
                     m = messageToBytes(m)
-                    
                     self.sendSockets[self.senderInterface[sender[0]]].sendto(m,sender)
                     
         except BaseException as e:
