@@ -256,6 +256,7 @@ class Router:
                     msg = bytesToMessage(msg)
                     
                     if dest_ip == '10.0.2.15':
+                        logger.error(f"msg for eth0 from {receiver.getsockname()}")
                         continue
                     
                     self.interfaceSender[dest_ip] = addr[0]

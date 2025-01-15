@@ -175,11 +175,12 @@ class SharedTable:
             if self.garbage[IP].tick():
                 
                 self.tableLock.acquire()
+                self.IPLock[IP].acquire()
                 del self.garbage[IP]
                 del self.timeout[IP]
                 del self.flags[IP]
                 del self.entries[IP]
-                del self.IPLock[IP]
+                self.IPLock[IP].release()
                 self.tableLock.release()
                 
             
@@ -192,9 +193,9 @@ class SharedTable:
         '''
         IPList = []
         self.tableLock.acquire()
-        IPList = list(self.garbage.keys())
+        IPList = list(self.timeout.keys())
         self.tableLock.release()
-        
+        released = False
         for IP in IPList:
             try:
                 
@@ -207,8 +208,13 @@ class SharedTable:
                     self.flags[IP] = Flags.CHANGED
                     self.triggerUpdate()
                     self.IPLock[IP].release()
+                    released = True
             except KeyError:
                 continue
+            finally:
+                if not released:
+                    self.IPLock[IP].release()
+                
                 
     def cleanup(self)->None:
         '''
