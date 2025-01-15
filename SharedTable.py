@@ -222,15 +222,16 @@ class SharedTable:
         '''
         Returns a list of all the entries in the table.
         '''
-        with self.managerLock:
-            ret = []
-            for IP in list(self.entries.keys()):
-                try:
-                    e = RIPEntry(other=self.entries[IP])
-                    ret.append(e)
-                except KeyError:
-                    continue
-            return ret
+        self.managerLock.acquire()
+        ret = []
+        for IP in list(self.entries.keys()):
+            try:
+                e = RIPEntry(other=self.entries[IP])
+                ret.append(e)
+            except KeyError:
+                continue
+        self.managerLock.release()
+        return ret
     
     def getAllTimeout(self)->Dict[str,Timer]:
         ret = dict()
@@ -267,15 +268,15 @@ class SharedTable:
         '''
         Returns all the entries that are changed. Beware returned entries are marked as unchanged when added to the result.
         '''
-        with self.managerLock:
-            ret = []
-            for IP in list(self.entries.keys()):
-                try:
-                    if self.flags[IP] == Flags.CHANGED:
-                        e = RIPEntry(other=self.entries[IP])
-                        ret.append(e)
-                        self.flags[IP] = Flags.UNCHANGED
-                except KeyError:
-                    continue
-            
-            return ret
+        self.managerLock.acquire()
+        ret = []
+        for IP in list(self.entries.keys()):
+            try:
+                if self.flags[IP] == Flags.CHANGED:
+                    e = RIPEntry(other=self.entries[IP])
+                    ret.append(e)
+                    self.flags[IP] = Flags.UNCHANGED
+            except KeyError:
+                continue
+        self.managerLock.release()
+        return ret

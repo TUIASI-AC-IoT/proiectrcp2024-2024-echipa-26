@@ -608,7 +608,7 @@ def browse(stdscr, router):
     
     stdscr.refresh()
     draw()
-    refresh = Timer(0.1)
+    refresh = Timer(1)
     refresh.activate()
     
     
