@@ -201,6 +201,8 @@ Obiectul SharedTable poate de asemenea sa trimita semnale de tipul triggered upd
 
 Procesul CLI pune la dispozitie 3 moduri: browse, commands si search dintre care doar browse si commands sunt functionale. Browse permite utilizatorului sa vada toate entry-urile din tabela si timer-ele asociate in timp real. Modul commands pune la dispozitie cateva comenzi ce pot fi vazute prin comanda "help". Dintre comenzile puse la dispozitie se remarca: set/get IP timeout/garbage/metric newVal care permite schimbarea parametrilor tuturor entry-urilor ce au venit pe o anumita interfata. Acest lucru se realizeaza prin apelul unor metode din SharedTable care retine de altfel si valorile pentru metrica, timeout si garbage pentru toate interfetele participante.
 
+Lungimea maxima pentru descoperirea unei rute este setata din run.sh eventual din rerun.sh. Aceasta valore trebuie sa fie aceeasi pe toate masinile.
+
 ---
 
 ### <ins>Interfata</ins>
@@ -246,6 +248,8 @@ Prin intermediul acestui meniu, se pot cauta RIP entry-uri specifice, dupa valor
 - Utilizare sockets: a trebuit sa incercam mai multe variante de setari pana am reusit sa intelegem cum functioneaza si sa reusim sa setam socket-urile pentru a primi mesaje unicast si multicast si pentru a trimite atat multicast cat si unicast.
 
 - Procesul de dezvoltare: a fost incomod modul de testare a codului: modificarea codului de pe masina host, push pe github, masina guest face pull de pe github.
+
+- Wireshark: intrucat distributia de Linux este relativ minimala, nu am putut instalat tshark iar wireshark (rulat de pe masina host) nu a putut receptiona pachetele trimise intre masini. Am creat scriptul activateVBOX.sh care pune virtualbox-ul sa genereze fisiere .pcap pentru toate interfetele de pe o masina in folder cfg/r{ID}. Dupa care, scriptul merge.sh da merge la toate fisierele .pcap dintr-un folder cfg/r{ID} si genereaza un fisier .pcap cu toate pachetele trimise/primite de o masina virtuala.
 
 ---
 
