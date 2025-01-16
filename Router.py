@@ -5,7 +5,7 @@ from os import kill
 import sys
 import struct
 import select
-from random import randint, seed
+from random import randint, seed, random
 from time import sleep, time
 from traceback import format_exc
 
@@ -352,7 +352,7 @@ class Router:
             signal.signal(UPDATE_SIGNAL, update)
             
             seed(time())
-            sleep(randint(1,10))
+            sleep(random()*10)
             
             for sock in list(self.sendSockets.values()):
                 null = RIPEntry(metric=INF, AF_id=0)
