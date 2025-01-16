@@ -222,9 +222,9 @@ def modify(stdscr, router):
                 
             
             if router.timeCheckerProcess.is_alive():
-                text=text+"TimeChecker: Up|"
+                text=text+"TimeChecker: Up"
             else:
-                text = text+"TimeChecker: Down|"
+                text = text+"TimeChecker: Down"
             
             addToBuffer(text)
         elif text.lower() == "clear":
