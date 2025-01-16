@@ -4,7 +4,7 @@ import struct
 
 
 class RIPEntry:
-    def __init__(self, AF_id=socket.AF_INET, ip='0.0.0.0', subnet='0.0.0.0', nextHop='0.0.0.0', metric=0, routeTag=0, other=None):
+    def __init__(self, AF_id=int(socket.AF_INET), ip='0.0.0.0', subnet='0.0.0.0', nextHop='0.0.0.0', metric=0, routeTag=0, other=None):
         if other is not None:
             self.AF_id = int(other.getAF_id())
             self.ip = other.getIP()
@@ -13,6 +13,25 @@ class RIPEntry:
             self.metric = other.getMetric()
             self.routeTag = other.getRT()
         else:
+            if not isinstance(AF_id, int):
+                raise(TypeError())
+            
+            if not isinstance(ip, str):
+                raise(TypeError())
+            
+            if not isinstance(subnet, str):
+                raise(TypeError())
+            
+            if not isinstance(nextHop, str):
+                raise(TypeError())
+            
+            if not isinstance(metric, int):
+                raise(TypeError())
+            
+            if not isinstance(routeTag, int):
+                raise(TypeError())
+            
+            
             self.AF_id = int(AF_id)
             self.ip = ip
             self.subnet = subnet
@@ -93,10 +112,10 @@ def bytesToRIP(bytes : bytes)->RIPEntry:
     Converts bytes to a RIP entry.
     '''
     unpacked_data = struct.unpack('!2H4I', bytes)
-    address_family_identifier = unpacked_data[0]
-    route_tag = unpacked_data[1]
+    address_family_identifier = int(unpacked_data[0])
+    route_tag = int(unpacked_data[1])
     ipv4 = socket.inet_ntoa(unpacked_data[2].to_bytes(4, 'big'))
     subnet = socket.inet_ntoa(unpacked_data[3].to_bytes(4, 'big'))
     next_hop = socket.inet_ntoa(unpacked_data[4].to_bytes(4,'big')) 
-    metric = unpacked_data[5]
+    metric = int(unpacked_data[5])
     return RIPEntry(AF_id=address_family_identifier, ip= ipv4, subnet= subnet, nextHop= next_hop, metric = metric, routeTag= route_tag)
