@@ -315,6 +315,7 @@ class Router:
                 
             def update(a,b):
                 entries = self.table.getAllEntries()
+                self.table.setFlagsUnchanged()
                 for s in list(self.sendSockets.values()):
                     myIP = s.getsockname()[0]
                     splitHorizon = []

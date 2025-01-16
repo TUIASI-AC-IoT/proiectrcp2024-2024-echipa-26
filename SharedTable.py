@@ -366,7 +366,6 @@ class SharedTable:
         Returns all the entries that are changed. Beware returned entries are marked as unchanged when added to the result.
         '''
         
-        IPlist =[]
         #self.tableLock.acquire()
         IPlist = list(self.entries.keys())
         #self.tableLock.release()
@@ -383,3 +382,15 @@ class SharedTable:
                 continue
        
         return ret
+    
+    def setFlagsUnchanged(self):
+        '''
+        Sets all flags to unchanged.
+        '''
+        IPlist = list(self.entries.keys())
+        for IP in IPlist:
+            try:
+                
+                self.flags[IP] = Flags.UNCHANGED
+            except KeyError:
+                continue
