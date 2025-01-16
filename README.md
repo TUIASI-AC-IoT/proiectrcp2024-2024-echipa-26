@@ -245,6 +245,8 @@ Prin intermediul acestui meniu, se pot cauta RIP entry-uri specifice, dupa valor
 
 - Utilizare sockets: a trebuit sa incercam mai multe variante de setari pana am reusit sa intelegem cum functioneaza si sa reusim sa setam socket-urile pentru a primi mesaje unicast si multicast si pentru a trimite atat multicast cat si unicast.
 
+- Procesul de dezvoltare: a fost incomod modul de testare a codului: modificarea codului de pe masina host, push pe github, masina guest face pull de pe github.
+
 ---
 
 #### <ins>Bibliografie</ins>
