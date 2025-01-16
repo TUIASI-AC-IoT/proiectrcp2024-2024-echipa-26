@@ -171,7 +171,8 @@ def modify(stdscr, router):
                 'q-quit this mode.',
                 'clear-clears the screen.',
                 'interfaces-displays the IP addresses.',
-                'status-prints the pids of the processes.'
+                'status-prints the pids of the processes.',
+                'browse-enter browse mode.'
                 ]
     
    
@@ -214,6 +215,8 @@ def modify(stdscr, router):
             output_win.addstr(1, middle_x - 6, "OUTPUT", curses.A_BOLD)  
             output_win.refresh()
             text_buffer = []
+        elif text.lower() == "browse":
+            browse(stdscr, router)
         elif text.lower()=="help":
             
             
@@ -608,8 +611,7 @@ def browse(stdscr, router):
     
     stdscr.refresh()
     draw()
-    refreshData = Timer(5)
-    refreshData.activate()
+    
     
     
     refreshDraw = Timer(0.1)
@@ -618,10 +620,6 @@ def browse(stdscr, router):
     while True:
         
         if refreshDraw.tick():
-            draw()
-            refreshDraw.reset()
-        
-        if refreshData.tick():
             entries = router.table.getAllEntries()
             timeoutDict = router.table.getAllTimeout()
             garbageDict = router.table.getAllGarbage()
@@ -641,7 +639,10 @@ def browse(stdscr, router):
                 upRight = False
                 downLeft = False
                 downRight = True
-            refreshData.reset()
+            draw()
+            refreshDraw.reset()
+        
+        
         
 
         
