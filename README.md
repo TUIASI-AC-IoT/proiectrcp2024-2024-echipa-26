@@ -197,12 +197,32 @@ Al doilea proces verifica daca exista mesaje de procesat de la primul proces. Da
 
 ### <ins>Interfata</ins>
 
-Interfata este realizata utilizand modulul <b>curses</b> din python. Am generat 3 meniuri din care utilizatorul poate alege:
+Interfata este realizata utilizand modulul <b>curses</b> din python. Am generat 4 meniuri, unul de start si 3 din care utilizatorul poate alege:
+<br></br>
+- ***<b>MENIU PRINCIPAL</b>***:
+<br></br>
+  ![BROWSE](/Images/meniu.png)
 
 - ***<b>BROWSE</b>***:
+<br></br>
+Scopul acestui meniu este de a oferi detalii in legatura cu valorile ce se regasesc in formatul de mesaj RIPv2 pentru fiecare router in parte, cat si despre orice interfata prezenta, conform topologiei descrisa in documentatie. Se poate naviga prin intermediul tastaturii, prin intermediul sagetilor (←, ↑, →, ↓).
+<br></br>
+  ![BROWSE](/Images/browse_initial.png)
+<br></br>
+  ![BROWSE](/Images/browse.png)
+<br></br> 
 - ***<b>COMMANDS</b>***:
-- ***<b>SEARCH</b>***:
+<br></br>
+In sectiunea <b>COMMANDS</b> se pot introduce o serie de comenzi pentru a obtine, cat si pentru a configura valori customizabile pentru <mark>metrica</mark>, <mark>timeout</mark> si <mark>garbage</mark>. La deschiderea initiala a meniului, utilizatorul vede o sectiune de "help" pentru a observa comenzile ce pot fi rulate. Daca ecranul este golit, comanda "help" poate fi rulata din nou pentru indicatii.
+<br></br>
 
+   ![COMMANDS](/Images/commands.png)
+<br></br>
+- ***<b>SEARCH</b>***:
+<br></br>
+Prin intermediul acestui meniu, se pot cauta RIP entry-uri specifice, dupa valorile introduse in campurile aferente. Momentan, comenzile nu sunt implementate. Totusi, ne-am gandit sa folosim un regex pentru a gasi grupul de entry-uri care indeplineste criteriile cautate (ex.: IP: 192.* -> ar afisa toate entry-urile al caror IP incepe cu 192). Dupa ce datele sunt introduse, este creat un meniu similar cu <b>BROWSE</b>, unde pot fi vizualizate toate enty-urile corespunzatoare (to be continued...).
+<br></br>
+   ![SEARCH](/Images/search.png)
 ---
 
 ### <ins>Dificultati intalnite pe parcurs<ins>
