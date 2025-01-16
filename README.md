@@ -187,11 +187,19 @@ Fiecare interfata are un fisier de config pentru a putea reasigna adresele IP.
   
 </div>
 
-Inainte de rularea efectiva a programului este necesara configurarea adreselor statice prin modulul amintit anterior. Dupa configurare, se ruleaza programul principal care va astepta un numar de secunde aleator pentru a da timp si celorlalte programe (de pe masini virtuale distincte) sa porneasca. Programul deschide doua subprocese: unul pentru a "asculta" request-uri sau mesaje provenite de la vecini si unul care raspunde la mesajele primite. 
+Inainte de rularea efectiva a programului este necesara configurarea adreselor statice prin modulul amintit anterior. Dupa configurare, procesul principal citeste niste configuratii de tipul: adrese IP, ID, valoare INF si creaaza un obiect de tipul Router. Obiectul porneste 3 procese copil: unul pentru trimis pachete, unul pentru receptionat si unul pentru verificat timer-e, in procesul parinte ruland interfata de terminal.
 
-Primul proces asteapta un numar de secunde aleator pentru a nu se trimite prea multe mesaje prin multicast in acelasi timp dupa care trimite un request catre vecinii sai. Dupa trimiterea request-ului rolul procesului este de asculta mesaje noi aparute de la vecini si de a le trimite catre cel de-al doilea proces.
+Toate cele 4 procese (incluzand parintele) au in comun un obiect de tip SharedTable care contine tabela de rutare. Obiectul SharedTable creeaza niste structuri de date prin intermediul altor obiecte oferite de modulul multiprocessing (Manager, BaseManager) ce au drept scop sincronizarea datelor. Astfel toate procesele au acces la datele din tabela de rutare.
 
-Al doilea proces verifica daca exista mesaje de procesat de la primul proces. Daca exista, procesul raspunde in mod adecvat in functie de tipul mesajului. Acest proces se ocupa de update-ul tabelei de rutare si de managementul timer-elor.
+Procesul send reactioneaza la 2 semnale: unul de update si unul de triggered update. Acesta comunica cu procesul listen printr-un pipe prin care primeste detaliile legate de request-urile primite.
+
+Procesul listen asteapta sa primeasca mesaje multicast si unicast si raspunde in mod adecvat la acestea. De asemenea acesta este responsabil pentru mentinerea a doua dictionarea ce contin date relevante pentru Split Horizon (pentru fiecare sender este asociat adresa IP a interfetei de pe care a venit mesajul).
+
+Procesul timerChecker verifica in mod constant timer-ele de timeout, garbage, update si triggered update. Cand un timer de timeout expira, acesta modifica entry-ul din tabela printr-o metoda oferita de SharedTable. Cand un timer de garbage expira, modificarea are loc intr-un mod similar. De asemenea, verificarea timer-elor ce tine de entry-uri este facuta prin intermediul unei metode din SharedTable. Cand timer-ul update expira, procesul trimite un semnal catre procesul de send. Cand timer-ul triggered update expira, procesul trimite un semnal catre acelasi proces send.
+
+Obiectul SharedTable poate de asemenea sa trimita semnale de tipul triggered update catre send prin urmatorul mecanism: acesta trimite semnalul in momentul in care un flag devine CHANGED si il trimite catre procesul parinte si anume CLI. Acesta reactioneaza la semnal prin propagarea acestuia catre procesul send.
+
+Procesul CLI pune la dispozitie 3 moduri: browse, commands si search dintre care doar browse si commands sunt functionale. Browse permite utilizatorului sa vada toate entry-urile din tabela si timer-ele asociate in timp real. Modul commands pune la dispozitie cateva comenzi ce pot fi vazute prin comanda "help". Dintre comenzile puse la dispozitie se remarca: set/get IP timeout/garbage/metric newVal care permite schimbarea parametrilor tuturor entry-urilor ce au venit pe o anumita interfata. Acest lucru se realizeaza prin apelul unor metode din SharedTable care retine de altfel si valorile pentru metrica, timeout si garbage pentru toate interfetele participante.
 
 ---
 
@@ -207,6 +215,15 @@ Interfata este realizata utilizand modulul <b>curses</b> din python. Am generat 
 
 ### <ins>Dificultati intalnite pe parcurs<ins>
 
+- Implementare Split Horizon: am gasit cu greu o optiune in manualul de linux ce permite socket-urilor sa receptioneze si adresa IP a interfetei de pe care a primit un mesaj. Astfel putem asocia adresa IP de pe o interfata cu adresa IP a unui vecin indiferent de tipul de mesaj si modul in care a ajuns la noi (multicast, unicast).
+
+- Sincronizarea proceselor: am avut probleme la sincronizarea/comunicatia intre proceselor folosing obiecte de tip Manager, dar am reusit in momentul in care am inceput sa folosim doar getter-e si setter-e pentru obiectele complexe precum RIPEntry si Timer.
+
+- Raspuns la response: am avut probleme in urmarirea RFC-ului intrucat logica din spate nu era explicata, RFC-ul doar prezentand cea mai optima abordare pe care am reusit sa o implementam.
+
+- Masinile virtuale: din cauza naturii efemere a distributiei de Linux alese, setup-ul initial a fost anevoios.
+
+- Utilizare sockets: a trebuit sa incercam mai multe variante de setari pana am reusit sa intelegem cum functioneaza si sa reusim sa setam socket-urile pentru a primi mesaje unicast si multicast si pentru a trimite atat multicast cat si unicast.
 
 ---
 
