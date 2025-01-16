@@ -13,23 +13,7 @@ class RIPEntry:
             self.metric = other.getMetric()
             self.routeTag = other.getRT()
         else:
-            if not isinstance(AF_id, int):
-                raise(TypeError())
             
-            if not isinstance(ip, str):
-                raise(TypeError())
-            
-            if not isinstance(subnet, str):
-                raise(TypeError())
-            
-            if not isinstance(nextHop, str):
-                raise(TypeError())
-            
-            if not isinstance(metric, int):
-                raise(TypeError())
-            
-            if not isinstance(routeTag, int):
-                raise(TypeError())
             
             
             self.AF_id = int(AF_id)
