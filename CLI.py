@@ -208,7 +208,25 @@ def modify(stdscr, router):
             stdscr.refresh()
             return
         elif text.lower()=="status":
-            addToBuffer(f'{router.listenProcess.is_alive()} {router.sendProcess.is_alive()} {router.timeCheckerProcess.is_alive()}')
+            text = ""
+            if router.listenProcess.is_alive():
+                text=text+"Listen: Up"
+            else:
+                text = text+"Listen: Down"
+            
+            text = text+" "
+            if router.sendProcess.is_alive():
+                text=text+"Send: Up"
+            else:
+                text = text+"Send: Down"
+                
+            text = text+" "
+            if router.timeCheckerProcess.is_alive():
+                text=text+"Send: Up"
+            else:
+                text = text+"Send: Down"
+            
+            addToBuffer(text)
         elif text.lower() == "clear":
             output_win.clear()  
             output_win.box()  
