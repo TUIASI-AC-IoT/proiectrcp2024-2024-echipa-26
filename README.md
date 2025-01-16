@@ -195,6 +195,21 @@ Al doilea proces verifica daca exista mesaje de procesat de la primul proces. Da
 
 ---
 
+### <ins>Interfata</ins>
+
+Interfata este realizata utilizand modulul <b>curses</b> din python. Am generat 3 meniuri din care utilizatorul poate alege:
+
+- ***<b>BROWSE</b>***:
+- ***<b>COMMANDS</b>***:
+- ***<b>SEARCH</b>***:
+
+---
+
+### <ins>Dificultati intalnite pe parcurs<ins>
+
+
+---
+
 #### <ins>Bibliografie</ins>
 
 - https://ro.wikipedia.org/wiki/RIP
@@ -209,3 +224,5 @@ Al doilea proces verifica daca exista mesaje de procesat de la primul proces. Da
 - https://github.com/github/gitignore/blob/main/Python.gitignore
 - https://docs.python.org/3/howto/sockets.html
 - https://linux.die.net/man/7/ip
+- https://docs.python.org/3/howto/curses.html
+- https://docs.python.org/3/library/curses.html
