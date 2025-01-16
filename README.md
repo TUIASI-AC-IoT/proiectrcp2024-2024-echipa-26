@@ -250,6 +250,10 @@ Prin intermediul acestui meniu, se pot cauta RIP entry-uri specifice, dupa valor
 - Procesul de dezvoltare: a fost incomod modul de testare a codului: modificarea codului de pe masina host, push pe github, masina guest face pull de pe github.
 
 - Wireshark: intrucat distributia de Linux este relativ minimala, nu am putut instalat tshark iar wireshark (rulat de pe masina host) nu a putut receptiona pachetele trimise intre masini. Am creat scriptul activateVBOX.sh care pune virtualbox-ul sa genereze fisiere .pcap pentru toate interfetele de pe o masina in folder cfg/r{ID}. Dupa care, scriptul merge.sh da merge la toate fisierele .pcap dintr-un folder cfg/r{ID} si genereaza un fisier .pcap cu toate pachetele trimise/primite de o masina virtuala.
+  <br></br>
+  ![WIRESHARK](/Images/wireshark.png)
+  <br></br>
+- Interfata: <b>curses</b> este un modul vechi care nu mai are suport. Am avut o multitudine de probleme la generarea ecranelor, cat si la generarea textelor. Incadrarea corespunzatoare in fereasta de terminal este o problema majora peste care am reusit sa trecem (cu greu). Totodata, documentatia nu este foarte explicita (am folosit si howto-ul pentru curses care contine doar informatii elementare, de baza, nu foarte ajutatoare).
 
 ---
 
