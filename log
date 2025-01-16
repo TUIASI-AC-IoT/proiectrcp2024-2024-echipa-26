@@ -1,0 +1,71 @@
+2025-01-16 07:06:53,800 - DEBUG - Sent 2 entries as a response to a request from ('192.168.1.2', 520).
+2025-01-16 07:06:53,924 - DEBUG - Ans response from ('192.168.1.2', 520), 2 entries.
+2025-01-16 07:06:56,090 - DEBUG - Trigger update using socket 192.168.1.1. Sent 0. Receiver should be: 192.168.1.2
+2025-01-16 07:06:58,066 - DEBUG - Ans response from ('192.168.1.2', 520), 0 entries.
+2025-01-16 07:06:58,231 - DEBUG - Sent 4 entries as a response to a request from ('192.168.2.3', 520).
+2025-01-16 07:06:58,424 - DEBUG - Ans response from ('192.168.2.3', 520), 3 entries.
+2025-01-16 07:07:00,581 - DEBUG - Trigger update using socket 192.168.1.1. Sent 3. Receiver should be: 192.168.1.2
+2025-01-16 07:07:00,586 - DEBUG - Trigger update using socket 192.168.2.1. Sent 0. Receiver should be: 192.168.2.3
+2025-01-16 07:07:00,632 - ERROR - Traceback (most recent call last):
+  File "/home/tc/pr/Router.py", line 365, in send
+    if pipe.poll(0.1):
+  File "/usr/local/lib/python3.6/multiprocessing/connection.py", line 257, in poll
+    return self._poll(timeout)
+  File "/usr/local/lib/python3.6/multiprocessing/connection.py", line 414, in _poll
+    r = wait([self], timeout)
+  File "/usr/local/lib/python3.6/multiprocessing/connection.py", line 911, in wait
+    ready = selector.select(timeout)
+  File "/usr/local/lib/python3.6/selectors.py", line 376, in select
+    fd_event_list = self._poll.poll(timeout)
+  File "/home/tc/pr/Router.py", line 284, in triggeredUpdate
+    changed = self.table.getAllChangedEntries()
+  File "/home/tc/pr/SharedTable.py", line 378, in getAllChangedEntries
+    e = RIPEntry(other=self.entries[IP])
+  File "/home/tc/pr/RIPEntry.py", line 14, in __init__
+    self.routeTag = other.getRT()
+  File "<string>", line 2, in getRT
+  File "/usr/local/lib/python3.6/multiprocessing/managers.py", line 757, in _callmethod
+    kind, result = conn.recv()
+  File "/usr/local/lib/python3.6/multiprocessing/connection.py", line 250, in recv
+    buf = self._recv_bytes()
+  File "/usr/local/lib/python3.6/multiprocessing/connection.py", line 407, in _recv_bytes
+    buf = self._recv(4)
+  File "/usr/local/lib/python3.6/multiprocessing/connection.py", line 379, in _recv
+    chunk = read(handle, remaining)
+  File "/home/tc/pr/Router.py", line 305, in triggeredUpdate
+    b = messageToBytes(m)
+  File "/home/tc/pr/Message.py", line 33, in messageToBytes
+    r = RIPtoBytes(entry)
+  File "/home/tc/pr/RIPEntry.py", line 84, in RIPtoBytes
+    arr.append(socket.inet_aton(RIPent.getIP()))
+TypeError: inet_aton() argument 1 must be str, not int
+
+2025-01-16 07:07:01,076 - DEBUG - Ans response from ('192.168.2.3', 520), 10 entries.
+2025-01-16 07:07:01,172 - DEBUG - Ans response from ('192.168.2.3', 520), 3 entries.
+2025-01-16 07:07:01,736 - DEBUG - Ans response from ('192.168.1.2', 520), 8 entries.
+2025-01-16 07:07:03,769 - ERROR - Traceback (most recent call last):
+  File "/home/tc/pr/Router.py", line 391, in checkTimers
+    self.manageTimers()
+  File "/home/tc/pr/Router.py", line 211, in manageTimers
+    kill(self.sendProcess.pid, TRIGGER_UPDATE_SIGNAL)
+ProcessLookupError: [Errno 3] No such process
+
+2025-01-16 07:07:20,904 - DEBUG - Ans response from ('192.168.2.3', 520), 15 entries.
+2025-01-16 07:07:48,920 - ERROR - Traceback (most recent call last):
+  File "/home/tc/pr/Router.py", line 269, in listen
+    self.table.answerResponse(addr, msg, self.senderInterface[addr[0]])
+  File "/home/tc/pr/SharedTable.py", line 113, in answerResponse
+    entry.setMetric((int(min(entry.getMetric()+self.metricVals[myIP], INF))))
+  File "<string>", line 2, in __getitem__
+  File "/usr/local/lib/python3.6/multiprocessing/managers.py", line 756, in _callmethod
+    conn.send((self._id, methodname, args, kwds))
+  File "/usr/local/lib/python3.6/multiprocessing/connection.py", line 206, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+  File "/usr/local/lib/python3.6/multiprocessing/connection.py", line 404, in _send_bytes
+    self._send(header + buf)
+  File "/usr/local/lib/python3.6/multiprocessing/connection.py", line 368, in _send
+    n = write(self._handle, buf)
+  File "/home/tc/pr/Router.py", line 241, in sigterm
+    sys.exit(0)
+SystemExit: 0
+
