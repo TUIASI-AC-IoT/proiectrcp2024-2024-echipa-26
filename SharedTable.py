@@ -273,11 +273,14 @@ class SharedTable:
         
         
         diffMetric = newVal -self.metricVals[myIP]
+        if diffMetric==0:
+            return
         self.metricVals[myIP] = newVal
         
         for IP in self.entries.keys():
             if self.entries[IP].getNextHop() == neighborIP:
                 self.entries[IP].setMetric(min(self.entries[IP].getMetric()+diffMetric, INF))
+                self.triggerUpdate()
             
 
     def getTimeout(self, myIP:str):
