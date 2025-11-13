@@ -17,8 +17,8 @@ def main():
         garbage = dict()
         
         ID = environ['ID']
-        
-        path = f'/home/tc/pr/cfg/r{ID}'
+
+        path = f'/app/cfg/r{ID}'
         for config in listdir(path):
             configPath = path+f'/{config}'
             file = open(configPath)

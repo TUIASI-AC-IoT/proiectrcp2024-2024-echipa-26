@@ -1,0 +1,50 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Documentation and images
+README.md
+DOCKER_README.md
+Images/
+*.png
+*.jpg
+*.jpeg
+
+# Logs (we'll create fresh ones in containers)
+log
+*.log
+logs/
+
+# VirtualBox specific
+activateVBOX.sh
+merge.sh
+rerun.sh
+run.sh
+*.pcap
+TODO
+
+# Mac
+.DS_Store
+
+# Test files
+test_*
+tests/

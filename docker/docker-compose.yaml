@@ -1,0 +1,298 @@
+services:
+  # Router 1: 192.168.1.1, 192.168.2.1
+  r1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ripv2-r1
+    hostname: r1
+    environment:
+      - ID=1
+      - INF=16
+    cap_add:
+      - NET_ADMIN
+    networks:
+      net_192_168_1:
+        ipv4_address: 192.168.1.1
+      net_192_168_2:
+        ipv4_address: 192.168.2.1
+    stdin_open: true
+    tty: true
+
+  # Router 2: 192.168.1.2, 192.168.3.2
+  r2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ripv2-r2
+    hostname: r2
+    environment:
+      - ID=2
+      - INF=16
+    cap_add:
+      - NET_ADMIN
+    networks:
+      net_192_168_1:
+        ipv4_address: 192.168.1.2
+      net_192_168_3:
+        ipv4_address: 192.168.3.2
+    stdin_open: true
+    tty: true
+
+  # Router 3: 192.168.2.3, 192.168.3.3, 192.168.4.3
+  r3:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ripv2-r3
+    hostname: r3
+    environment:
+      - ID=3
+      - INF=16
+    cap_add:
+      - NET_ADMIN
+    networks:
+      net_192_168_2:
+        ipv4_address: 192.168.2.3
+      net_192_168_3:
+        ipv4_address: 192.168.3.3
+      net_192_168_4:
+        ipv4_address: 192.168.4.3
+    stdin_open: true
+    tty: true
+
+  # Router 4: 192.168.4.4, 192.168.5.4, 192.168.224.4
+  r4:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ripv2-r4
+    hostname: r4
+    environment:
+      - ID=4
+      - INF=16
+    cap_add:
+      - NET_ADMIN
+    networks:
+      net_192_168_4:
+        ipv4_address: 192.168.4.4
+      net_192_168_5:
+        ipv4_address: 192.168.5.4
+      net_192_168_224:
+        ipv4_address: 192.168.224.4
+    stdin_open: true
+    tty: true
+
+  # Router 5: 192.168.5.5, 172.16.48.5
+  r5:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ripv2-r5
+    hostname: r5
+    environment:
+      - ID=5
+      - INF=16
+    cap_add:
+      - NET_ADMIN
+    networks:
+      net_192_168_5:
+        ipv4_address: 192.168.5.5
+      net_172_16_48:
+        ipv4_address: 172.16.48.5
+    stdin_open: true
+    tty: true
+
+  # Router 6: 172.16.48.6, 172.16.8.6
+  r6:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ripv2-r6
+    hostname: r6
+    environment:
+      - ID=6
+      - INF=16
+    cap_add:
+      - NET_ADMIN
+    networks:
+      net_172_16_48:
+        ipv4_address: 172.16.48.6
+      net_172_16_8:
+        ipv4_address: 172.16.8.6
+    stdin_open: true
+    tty: true
+
+  # Router 7: 192.168.224.7, 172.16.8.7, 192.168.9.7
+  r7:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ripv2-r7
+    hostname: r7
+    environment:
+      - ID=7
+      - INF=16
+    cap_add:
+      - NET_ADMIN
+    networks:
+      net_192_168_224:
+        ipv4_address: 192.168.224.7
+      net_172_16_8:
+        ipv4_address: 172.16.8.7
+      net_192_168_9:
+        ipv4_address: 192.168.9.7
+    stdin_open: true
+    tty: true
+
+  # Router 8: 192.168.9.8, 192.168.64.8, 10.67.192.8
+  r8:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ripv2-r8
+    hostname: r8
+    environment:
+      - ID=8
+      - INF=16
+    cap_add:
+      - NET_ADMIN
+    networks:
+      net_192_168_9:
+        ipv4_address: 192.168.9.8
+      net_192_168_64:
+        ipv4_address: 192.168.64.8
+      net_10_67_192:
+        ipv4_address: 10.67.192.8
+    stdin_open: true
+    tty: true
+
+  # Router 9: 192.168.64.9, 10.3.64.9
+  r9:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ripv2-r9
+    hostname: r9
+    environment:
+      - ID=9
+      - INF=16
+    cap_add:
+      - NET_ADMIN
+    networks:
+      net_192_168_64:
+        ipv4_address: 192.168.64.9
+      net_10_3_64:
+        ipv4_address: 10.3.64.9
+    stdin_open: true
+    tty: true
+
+  # Router 10: 10.67.192.10, 10.3.64.10
+  r10:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: ripv2-r10
+    hostname: r10
+    environment:
+      - ID=10
+      - INF=16
+    cap_add:
+      - NET_ADMIN
+    networks:
+      net_10_67_192:
+        ipv4_address: 10.67.192.10
+      net_10_3_64:
+        ipv4_address: 10.3.64.10
+    stdin_open: true
+    tty: true
+
+networks:
+  net_192_168_1:
+    driver: ipvlan
+    driver_opts:
+      ipvlan_mode: l2
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+
+  net_192_168_2:
+    driver: ipvlan
+    driver_opts:
+      ipvlan_mode: l2
+    ipam:
+      config:
+        - subnet: 192.168.2.0/24
+
+  net_192_168_3:
+    driver: ipvlan
+    driver_opts:
+      ipvlan_mode: l2
+    ipam:
+      config:
+        - subnet: 192.168.3.0/24
+
+  net_192_168_4:
+    driver: ipvlan
+    driver_opts:
+      ipvlan_mode: l2
+    ipam:
+      config:
+        - subnet: 192.168.4.0/24
+
+  net_192_168_5:
+    driver: ipvlan
+    driver_opts:
+      ipvlan_mode: l2
+    ipam:
+      config:
+        - subnet: 192.168.5.0/24
+
+  net_192_168_224:
+    driver: ipvlan
+    internal: true
+    ipam:
+      config:
+        - subnet: 192.168.224.0/21
+
+  net_192_168_9:
+    driver: ipvlan
+    internal: true
+    ipam:
+      config:
+        - subnet: 192.168.9.0/24
+
+  net_192_168_64:
+    driver: ipvlan
+    internal: true
+    ipam:
+      config:
+        - subnet: 192.168.64.0/18
+
+  net_172_16_48:
+    driver: ipvlan
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.16.48.0/21
+
+  net_172_16_8:
+    driver: ipvlan
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.16.8.0/21
+
+  net_10_67_192:
+    driver: ipvlan
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.67.192.0/18
+
+  net_10_3_64:
+    driver: ipvlan
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.3.64.0/18
